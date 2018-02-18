@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AddMe</string>
+    <string name="facebook_app_id">365979163888235</string>
+    <string name="fb_login_protocol_scheme">fb365979163888235</string>
+    <string name="greeting">Hello, </string>
+    <string name="pool_id">us-east-1:99eed9b4-f0a9-4f6d-b34c-5f05a1a5fa6b</string>
+</resources>

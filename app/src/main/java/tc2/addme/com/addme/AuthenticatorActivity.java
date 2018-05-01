@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import com.amazonaws.mobile.auth.facebook.FacebookButton;
 import com.amazonaws.mobile.auth.google.GoogleButton;
@@ -13,11 +14,14 @@ import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
 
+
 public class AuthenticatorActivity extends Activity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator);
+
 
         AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
             @Override

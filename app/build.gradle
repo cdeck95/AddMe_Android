@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "tc2.addme.com.addme"
         minSdkVersion 23
@@ -21,32 +21,35 @@ android {
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
     // Mobile Client for initializing the SDK
-    compile('com.amazonaws:aws-android-sdk-mobile-client:2.6.+@aar') { transitive = true; }
+    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.6.+@aar') { transitive = true; }
 
     // Cognito UserPools for SignIn
-    compile('com.amazonaws:aws-android-sdk-auth-userpools:2.6.+@aar') { transitive = true; }
+    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.6.+@aar') { transitive = true; }
 
     // Sign in UI Library
-    compile('com.amazonaws:aws-android-sdk-auth-ui:2.6.+@aar') { transitive = true; }
+    implementation('com.amazonaws:aws-android-sdk-auth-ui:2.6.+@aar') { transitive = true; }
 
     // Facebook SignIn
-    compile ('com.amazonaws:aws-android-sdk-auth-facebook:2.6.+@aar') { transitive = true; }
+    implementation ('com.amazonaws:aws-android-sdk-auth-facebook:2.6.+@aar') { transitive = true; }
 
     // Google SignIn
-    compile ('com.amazonaws:aws-android-sdk-auth-google:2.6.+@aar') { transitive = true; }
+    implementation ('com.amazonaws:aws-android-sdk-auth-google:2.6.+@aar') { transitive = true; }
 
     // Picasso Images
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.google.android.gms:play-services-auth:11.8.0'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:25.3.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:support-v4:25.3.1'
+    implementation 'com.google.android.gms:play-services-auth:11.8.0'
+    implementation 'com.android.support:design:25.3.1'
+    implementation 'com.android.support:cardview-v7:25.3.1'
+    implementation 'com.android.support:recyclerview-v7:25.3.1'
+    testImplementation 'junit:junit:4.12'
 }

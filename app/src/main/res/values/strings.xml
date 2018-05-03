@@ -11,4 +11,7 @@
     <string name="action_help">Help</string>
     <string name="action_logout">Logout</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="default_app_id">-1</string>
+    <string name="default_app_display_name">\"Error Loading App\"</string>
+    <string name="default_app_platform">Unkown</string>
 </resources>

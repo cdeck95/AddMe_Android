@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.WindowId;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,8 +58,9 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         super.setupDialog(dialog, style);
         final View contentView = View.inflate(getContext(), R.layout.dialog_modal, null);
         dialog.setContentView(contentView);
-        TextView facebookTV = (TextView) contentView.findViewById(R.id.Facebook);
-        TextView twitterTV = (TextView) contentView.findViewById(R.id.Twitter);
+        ImageView facebookTV = (ImageView) contentView.findViewById(R.id.Facebook);
+        ImageView twitterTV = (ImageView) contentView.findViewById(R.id.Twitter);
+        ImageView instagramTV = (ImageView) contentView.findViewById(R.id.Instagram);
 
         facebookTV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,12 +70,18 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         });
 
         twitterTV.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             launchAlertDialog();
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog();
+            }
+        });
 
-                                         }
-                                     });
+        instagramTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog();
+            }
+        });
 
         CoordinatorLayout.LayoutParams layoutParams =
                 (CoordinatorLayout.LayoutParams) ((View) contentView.getParent()).getLayoutParams();
@@ -81,6 +89,8 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         if (behavior != null && behavior instanceof BottomSheetBehavior) {
             ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
         }
+//        facebookTV.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.facebook_icon), null, null, null);
+//        twitterTV.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.facebook_icon), null, null, null);
 
     }
 

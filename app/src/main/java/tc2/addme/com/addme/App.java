@@ -13,9 +13,19 @@ public class App implements Serializable
     private String platform;
     private String displayName;
     private String url;
+    private boolean appSwitchIsOn;
 
     public App(){
 
+    }
+
+    public App(int appID, String displayName, String platform, String url, Boolean appSwitchIsOn)
+    {
+        this.appID = appID;
+        this.displayName = displayName;
+        this.platform = platform;
+        this.url = url;
+        this.appSwitchIsOn = appSwitchIsOn;
     }
 
     public App(int appID, String displayName, String platform, String url)
@@ -56,6 +66,14 @@ public class App implements Serializable
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public boolean isAppSwitchIsOn() {
+        return appSwitchIsOn;
+    }
+
+    public void setAppSwitchIsOn(boolean appSwitchIsOn) {
+        this.appSwitchIsOn = appSwitchIsOn;
     }
 
 

@@ -27,7 +27,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     private ImageView imgProfile;
     private TextView namneTV;
     private ArrayList<App> apps;
-    private App app1, app2, app3;
+    private App app1, app2, app3, app4;
 
 
     @Override
@@ -37,13 +37,16 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         appList = (ListView) rootView.findViewById(R.id.appsListView);
-        app1 = new App(1, "Personal Facebook", "Facebook", "http://www.facebook.com");
-        app2 = new App(2, "Personal Twitter", "Twitter", "http://www.facebook.com");
-        app3 = new App(3, "Personal Instagram", "Instagram", "http://www.facebook.com");
+        app1 = new App(1, "Personal Facebook", "Facebook", "http://www.facebook.com", Boolean.TRUE);
+        app2 = new App(2, "Personal Twitter", "Twitter", "http://www.facebook.com",  Boolean.TRUE);
+        app3 = new App(3, "Personal Instagram", "Instagram", "http://www.facebook.com",  Boolean.TRUE);
+        app4 = new App(4, "Business Facebook", "Facebook", "http://www.facebook.com",  Boolean.TRUE);
         apps = new ArrayList<App>();
         apps.add(app1);
         apps.add(app2);
         apps.add(app3);
+        apps.add(app4);
+        populateApps(1, rootView);
 
         appList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override

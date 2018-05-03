@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,12 +39,30 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
         TextView txtAppDisplayName = (TextView)customView.findViewById(R.id.txtAppDisplayName);
         txtAppDisplayName.setText(singleApp.getDisplayName());
 
-        TextView txtAppPlatform = (TextView)customView.findViewById(R.id.txtAppPlatform);
-        txtAppPlatform.setText(singleApp.getPlatform());
+        Switch txtAppSwitch = (Switch) customView.findViewById(R.id.appSwitch);
+        singleApp.setAppSwitchIsOn(txtAppSwitch.isActivated());
 
         TextView txtAppID = (TextView) customView.findViewById(R.id.txtAppID);
         String appID = singleApp.getAppID() + "";
         txtAppID.setText(appID);
+
+        ImageView appImage = (ImageView) customView.findViewById(R.id.imageView);
+        String platform = singleApp.getPlatform();
+
+        switch (platform){
+            case "Facebook":
+                appImage.setImageResource(R.mipmap.ic_facebook);
+                break;
+            case "Twitter":
+                appImage.setImageResource(R.mipmap.ic_twitter);
+                break;
+            case "Instagram":
+                appImage.setImageResource(R.mipmap.ic_instagram);
+                break;
+            default:
+                appImage.setImageResource(R.mipmap.ic_launcher);
+                break;
+        }
 
         return customView;
     }

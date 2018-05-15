@@ -15,21 +15,21 @@
         <ImageView
             android:id="@+id/Facebook"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="75dp"
             android:layout_weight="1"
             app:srcCompat="@mipmap/ic_facebook" />
 
         <ImageView
             android:id="@+id/Twitter"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="75dp"
             android:layout_weight="1"
             app:srcCompat="@mipmap/ic_twitter" />
 
         <ImageView
             android:id="@+id/Instagram"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="75dp"
             android:layout_weight="1"
             app:srcCompat="@mipmap/ic_instagram" />
     </LinearLayout>
@@ -43,21 +43,21 @@
         <ImageView
             android:id="@+id/Snapchat"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="75dp"
             android:layout_weight="1"
             app:srcCompat="@mipmap/ic_snapchat" />
 
         <ImageView
             android:id="@+id/LinkedIn"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="75dp"
             android:layout_weight="1"
             app:srcCompat="@mipmap/ic_linked_in" />
 
         <ImageView
             android:id="@+id/googlePlus"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="75dp"
             android:layout_weight="1"
             app:srcCompat="@mipmap/ic_google_plus" />
     </LinearLayout>

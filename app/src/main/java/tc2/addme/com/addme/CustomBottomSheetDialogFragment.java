@@ -1,30 +1,33 @@
 package tc2.addme.com.addme;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.text.Editable;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowId;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -65,21 +68,21 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         facebookTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchAlertDialog();
+                launchAlertDialog("Facebook");
             }
         });
 
         twitterTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchAlertDialog();
+                launchAlertDialog("Twitter");
             }
         });
 
         instagramTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchAlertDialog();
+                launchAlertDialog("Instagram");
             }
         });
 
@@ -94,9 +97,10 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     }
 
-    private void launchAlertDialog() {
+    private void launchAlertDialog(String platformIn) {
         final AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
 
+        final String platform = platformIn;
         // Set Custom Title
         TextView title = new TextView(getContext());
         // Title Properties
@@ -142,8 +146,10 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
                 String display_name = displayName.getText().toString();
                 Log.e("Add App", userName);
                 Log.e("Add App", display_name);
+                new MyAsyncTask(getActivity(), userName, display_name, platform).execute("");
             }
         });
+
 
 
         new Dialog(getApplicationContext());
@@ -162,5 +168,31 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         negBtnLP.gravity = Gravity.FILL_HORIZONTAL;
         cancelBT.setTextColor(Color.RED);
         cancelBT.setLayoutParams(negBtnLP);
+    }
+}
+
+class MyAsyncTask extends AsyncTask<String, String, String> {
+    Activity mContext;
+    String userName, display_name, platform;
+    App app;
+
+    public MyAsyncTask(Activity mContext, String userName, String display_name, String platform) {
+        this.mContext = mContext;
+        this.userName = userName;
+        this.display_name = display_name;
+        this.platform = platform;
+    }
+
+    protected String doInBackground(String... params) {
+        app.setDisplayName(display_name);
+        app.setPlatform(platform);
+        app.setUrl("http://facebook.com/" + userName);
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(String result) {
+        //ping api with app
+        //this class can extend everywhere depending on what needs to be done
     }
 }

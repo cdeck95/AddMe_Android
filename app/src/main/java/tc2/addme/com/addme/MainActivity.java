@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,8 +31,7 @@ import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView facebookTV;
-    TextView twitterTV;
+    ImageButton imageButton;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        imageButton = (ImageButton) findViewById(R.id.imageButton);
         mSectionsPagerAdapter = new SectionPageAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -107,6 +107,17 @@ public class MainActivity extends AppCompatActivity {
             Uri personPhoto = acct.getPhotoUrl();
             //Picasso.with(getApplicationContext()).load(personPhoto).into(imageView);
         }
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Initializing a bottom sheet
+                BottomSheetDialogFragment bottomSheetDialogFragment = new PersonalCodeBottomSheetFragment();
+
+                //show it
+                bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+            }
+        });
 
     }
 

@@ -1,6 +1,7 @@
 package tc2.addme.com.addme;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -73,6 +74,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         });
 
 
+       // new MyAsyncTask(getActivity(), mListView).execute("");
 
 
         return rootView;
@@ -88,6 +90,45 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         Log.d(TAG, "----------in group list view on click listener---------------");
         Snackbar.make(view, "Clicked", Snackbar.LENGTH_LONG).show();
     }
+
+//    class MyAsyncTask extends AsyncTask<String, String, String>
+//    {
+//        GridView mGridView;
+//        Activity mContex;
+//        public  MyAsyncTask(Activity contex,GridView gview)
+//        {
+//            this.mGridView=gview;
+//            this.mContex=contex;
+//        }
+//
+//        protected String doInBackground(String... params)
+//        {
+//
+//            //fetch data
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            {
+//
+//                for(Sales sales : this.response.sales){
+//                    HashMap<String, String> hm = new HashMap<String,String>();
+//
+//                    if (sales.getCategories1().contains("12")){
+//                        //hm.put("sale_title", "" + sales.getShort_title());
+//                        for(Shop shop : this.response.shops){
+//                            String image_file = new String(        Environment.getExternalStorageDirectory().getAbsolutePath()
+//                                    + "/images/" + shop.getImage());
+//                            if(shop.getId().equals(sales.getShop_id())){
+//                                hm.put("shop_image", image_file );
+//                                System.out.println(shop_image);
+//                            }
+//                        }
+//                    }
+//                }
+//                if(hm.size()>0)
+//                    mcontext.mGridView.setAdapter(new ImageAdapter(mContext),hm);
+//            }
 
 
 }

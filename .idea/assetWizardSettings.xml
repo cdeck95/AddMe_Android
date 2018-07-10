@@ -20,7 +20,7 @@
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="imageAsset" value="$USER_HOME$/Downloads/ic_refresh_black_24dp/android/drawable-xxxhdpi/ic_refresh_black_24dp.png" />
-                                      <entry key="outputName" value="ic_refresh" />
+                                      <entry key="outputName" value="ic_launcher" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -29,11 +29,28 @@
                             <entry key="launcherLegacy">
                               <value>
                                 <PersistentState>
+                                  <option name="children">
+                                    <map>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="paddingPercent" value="-5" />
+                                                <entry key="trimmed" value="true" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                    </map>
+                                  </option>
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/google_plus_icon.png" />
-                                      <entry key="outputName" value="ic_google_plus" />
+                                      <entry key="backgroundColor" value="a5a5af" />
+                                      <entry key="cropped" value="true" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/ic_launcher (1)/res/mipmap-xxxhdpi/ic_launcher.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -43,7 +60,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
+                            <entry key="outputIconType" value="LAUNCHER_LEGACY" />
                           </map>
                         </option>
                       </PersistentState>
@@ -52,6 +69,11 @@
                 </map>
               </option>
             </PersistentState>
+          </value>
+        </entry>
+        <entry key="vectorWizard">
+          <value>
+            <PersistentState />
           </value>
         </entry>
       </map>

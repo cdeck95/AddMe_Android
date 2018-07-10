@@ -1,7 +1,10 @@
 package tc2.addme.com.addme;
 
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.content.SharedPreferences;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +15,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +26,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.auth.ui.SignInUI;
+import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.regions.Regions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,6 +38,7 @@ import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MAIN_ACTIVITY";
     ImageButton imageButton;
 
     /**
@@ -53,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageButton = (ImageButton) findViewById(R.id.imageButton);
+        //AWSMobileClient.getInstance().initialize(this).execute();
+
         mSectionsPagerAdapter = new SectionPageAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -96,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
                 Regions.US_EAST_1 // Region
         );
 
+        Log.d(TAG, credentialsProvider.getIdentityId()+"");
+        String cognitoId = credentialsProvider.getIdentityId();
+        CredentialsManager.getInstance().setCognitoId(cognitoId);
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
             String personName = acct.getDisplayName();
@@ -108,16 +120,7 @@ public class MainActivity extends AppCompatActivity {
             //Picasso.with(getApplicationContext()).load(personPhoto).into(imageView);
         }
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Initializing a bottom sheet
-                BottomSheetDialogFragment bottomSheetDialogFragment = new PersonalCodeBottomSheetFragment();
 
-                //show it
-                bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-            }
-        });
 
     }
 
@@ -148,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_logout) {
+            IdentityManager.getDefaultIdentityManager().signOut();
         }
 
         return super.onOptionsItemSelected(item);
@@ -219,4 +224,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new ImportCodeActivity(), "Import Code");
         viewPager.setAdapter(adapter);
     }
+
+
 }

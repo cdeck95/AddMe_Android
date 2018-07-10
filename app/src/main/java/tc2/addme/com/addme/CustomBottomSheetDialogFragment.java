@@ -3,6 +3,8 @@ package tc2.addme.com.addme;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -22,10 +24,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -35,6 +47,7 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     EditText displayName;
     EditText username;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,9 +157,9 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 String userName = username.getText().toString();
                 String display_name = displayName.getText().toString();
-                Log.e("Add App", userName);
-                Log.e("Add App", display_name);
-                new MyAsyncTask(getActivity(), userName, display_name, platform).execute("");
+                Log.d("Add App", userName);
+                Log.d("Add App", display_name);
+                new Networking(getActivity(), userName, display_name, platform).execute();
             }
         });
 
@@ -171,28 +184,153 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 }
 
-class MyAsyncTask extends AsyncTask<String, String, String> {
-    Activity mContext;
-    String userName, display_name, platform;
-    App app;
+ class Networking extends AsyncTask<Void, Void, Void> {
+        String title;
+        Context mcontext;
+        String userName, displayName, platform;
+        App app;
+        ProgressDialog mProgressDialog;
+        private static final String TAG = "Networking_AddApp";
+        HttpURLConnection urlConnection = null;
 
-    public MyAsyncTask(Activity mContext, String userName, String display_name, String platform) {
-        this.mContext = mContext;
+
+    public Networking(Context c, String userName, String display_name, String platform){
+        mcontext=c;
         this.userName = userName;
-        this.display_name = display_name;
+        this.displayName = display_name;
         this.platform = platform;
+        app = new App();
+    }
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mProgressDialog = new ProgressDialog(mcontext);
+        mProgressDialog.setTitle("Contacting Server");
+        mProgressDialog.setMessage("Loading...");
+        mProgressDialog.setIndeterminate(false);
+        mProgressDialog.show();
     }
 
-    protected String doInBackground(String... params) {
-        app.setDisplayName(display_name);
+    @Override
+    protected Void doInBackground(Void... params) {
+        //connect to API
+        JSONObject obj = null;
+        app.setDisplayName(displayName);
         app.setPlatform(platform);
         app.setUrl("http://facebook.com/" + userName);
+
+        String urlIn = "https://api.tc2pro.com/users";
+        //  ArrayList<String> accounts = new ArrayList<>();
+        JSONArray accounts = new JSONArray();
+        String cognitoId = CredentialsManager.getInstance().getCognitoId();
+        Log.d(TAG,  cognitoId);
+
+        String postData = "{\"user\": {\"cognitoId\": \"" + cognitoId + "\", \"displayName\": \"" + app.getDisplayName() + "\", \"platform\": \""
+                + platform + "\", \"url\": \"" + app.getUrl() + "\"}}";
+        Log.d(TAG, postData);
+        Log.d(TAG, "----added get apps by user url---");
+        Log.d(TAG, "URL: " + urlIn);
+
+        URL url = null;     //path for connection
+        try {
+            url = new URL(urlIn);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();       //open the connection
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "----Opened Connection---");
+        try {
+            urlConnection.setRequestMethod("POST");
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+
+        urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        urlConnection.setRequestProperty("Content-Length", ""+Integer.toString(postData.getBytes().length));
+        urlConnection.setRequestProperty("Content-Language", "en-US");
+        urlConnection.setUseCaches(false);
+        urlConnection.setDoInput(true);
+        urlConnection.setDoOutput(true);
+
+        byte[] outputInBytes = new byte[0];
+        try {
+            outputInBytes = postData.getBytes("UTF-8");
+            Log.d(TAG, outputInBytes+"");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        OutputStream os = null;
+        try {
+            os = urlConnection.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            os.write( outputInBytes );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            urlConnection.connect();        //finish the connection
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "----Connection Successful----");
+        InputStream inputStream = null;
+        int status = 0;
+        try {
+            status = urlConnection.getResponseCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(status >= HttpURLConnection.HTTP_BAD_REQUEST)
+                inputStream = urlConnection.getErrorStream();
+            else
+                inputStream = urlConnection.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "----reader----");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        Log.d(TAG, "----Buffer----");
+        StringBuffer buffer = new StringBuffer();
+        Log.d(TAG, "----after Buffer----");
+        String line = "";
+        do {
+            try {
+                line = reader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            buffer.append(line);
+        } while(line != null);
+
+        Log.d(TAG, "buffer: " + buffer.toString());
+        try {
+            obj = new JSONObject(buffer.toString());
+            //accounts = obj.getJSONArray("accounts");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        //ping api with app
-        //this class can extend everywhere depending on what needs to be done
+    protected void onPostExecute(Void result) {
+        // populate list
+        mProgressDialog.dismiss();
+        Log.d(TAG, "App added: " + app.toString());
     }
 }

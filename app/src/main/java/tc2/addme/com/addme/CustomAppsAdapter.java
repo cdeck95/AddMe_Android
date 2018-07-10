@@ -40,7 +40,9 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
         txtAppDisplayName.setText(singleApp.getDisplayName());
 
         Switch txtAppSwitch = (Switch) customView.findViewById(R.id.appSwitch);
+        txtAppSwitch.setChecked(Boolean.TRUE);
         singleApp.setAppSwitchIsOn(txtAppSwitch.isActivated());
+
 
         TextView txtAppID = (TextView) customView.findViewById(R.id.txtAppID);
         String appID = singleApp.getAppID() + "";

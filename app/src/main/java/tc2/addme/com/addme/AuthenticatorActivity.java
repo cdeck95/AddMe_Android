@@ -5,7 +5,10 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
+import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.auth.core.SignInStateChangeListener;
 import com.amazonaws.mobile.auth.facebook.FacebookButton;
 import com.amazonaws.mobile.auth.google.GoogleButton;
 import com.amazonaws.mobile.auth.ui.AuthUIConfiguration;
@@ -16,6 +19,8 @@ import com.amazonaws.mobile.client.AWSStartupResult;
 
 
 public class AuthenticatorActivity extends Activity {
+
+    private static final String TAG = "AUTHENTICATOR_ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,31 @@ public class AuthenticatorActivity extends Activity {
             }
         }).execute();
 
+        // Sign-in listener
+        IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
+            @Override
+            public void onUserSignedIn() {
+                Log.d(TAG, "User Signed In");
+            }
 
+            // Sign-out listener
+            @Override
+            public void onUserSignedOut() {
+
+                Log.d(TAG, "User Signed Out");
+                showSignIn();
+            }
+        });
+
+        showSignIn();
+
+    }
+
+    /*
+     * Display the AWS SDK sign-in/sign-up UI
+     */
+    private void showSignIn() {
+        SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
+        signin.login(AuthenticatorActivity.this, MainActivity.class).execute();
     }
 }

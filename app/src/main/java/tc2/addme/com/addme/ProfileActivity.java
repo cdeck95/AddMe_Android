@@ -2,12 +2,11 @@ package tc2.addme.com.addme;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -17,14 +16,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
-import android.widget.TextView;
-
-import com.google.android.gms.common.data.DataHolder;
-import com.google.gson.JsonArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,9 +35,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
 
 public class ProfileActivity extends Fragment implements AdapterView.OnItemClickListener {
 
@@ -151,17 +142,18 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         protected Void doInBackground(Void... params) {
             //connect to API
             JSONObject obj = null;
-            String urlIn = "https://api.tc2pro.com/getUserByID";
           //  ArrayList<String> accounts = new ArrayList<>();
             JSONArray accounts = new JSONArray();
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
+
             Log.d(TAG,  cognitoId);
             try {
                 JSONObject jsonObject = new JSONObject("{}");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            //parameters.put("cognitoId", cognitoId + "");
+//            parameters.put("cognitoId", cognitoId + "");
             String postData = "{\"user\": {\"cognitoId\": \"" + cognitoId + "\"}}";
             Log.d(TAG, postData);
             Log.d(TAG, "----added get apps by user url---");
@@ -180,7 +172,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             }
             Log.d(TAG, "----Opened Connection---");
             try {
-                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestMethod("GET");
             } catch (ProtocolException e) {
                 e.printStackTrace();
             }
@@ -229,6 +221,8 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             int status = 0;
             try {
                 status = urlConnection.getResponseCode();
+                Log.e(TAG, "Response Code: " + status);
+                Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
             } catch (IOException e) {
                 e.printStackTrace();
             }

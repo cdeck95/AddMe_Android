@@ -30,19 +30,19 @@ dependencies {
     })
 
     // Mobile Client for initializing the SDK
-    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.6.+@aar') { transitive = true; }
+    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.6.+@aar') { transitive = true }
 
     // Cognito UserPools for SignIn
-    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.6.+@aar') { transitive = true; }
+    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.6.+@aar') { transitive = true }
 
     // Sign in UI Library
-    implementation('com.amazonaws:aws-android-sdk-auth-ui:2.6.+@aar') { transitive = true; }
+    implementation('com.amazonaws:aws-android-sdk-auth-ui:2.6.+@aar') { transitive = true }
 
     // Facebook SignIn
-    implementation ('com.amazonaws:aws-android-sdk-auth-facebook:2.6.+@aar') { transitive = true; }
+    implementation ('com.amazonaws:aws-android-sdk-auth-facebook:2.6.+@aar') { transitive = true }
 
     // Google SignIn
-    implementation ('com.amazonaws:aws-android-sdk-auth-google:2.6.+@aar') { transitive = true; }
+    implementation ('com.amazonaws:aws-android-sdk-auth-google:2.6.+@aar') { transitive = true }
 
     // Picasso Images
     implementation 'com.squareup.picasso:picasso:2.5.2'
@@ -55,4 +55,7 @@ dependencies {
     implementation 'com.android.support:cardview-v7:25.3.1'
     implementation 'com.android.support:recyclerview-v7:25.3.1'
     testImplementation 'junit:junit:4.12'
+
+    implementation 'com.journeyapps:zxing-android-embedded:3.0.2@aar'
+    implementation 'com.google.zxing:core:3.3.0'
 }

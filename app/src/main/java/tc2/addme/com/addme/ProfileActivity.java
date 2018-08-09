@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,120 +143,40 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         protected Void doInBackground(Void... params) {
             //connect to API
             JSONObject obj = null;
-          //  ArrayList<String> accounts = new ArrayList<>();
             JSONArray accounts = new JSONArray();
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
             String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
 
-            Log.d(TAG,  cognitoId);
-            try {
-                JSONObject jsonObject = new JSONObject("{}");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-//            parameters.put("cognitoId", cognitoId + "");
-            String postData = "{\"user\": {\"cognitoId\": \"" + cognitoId + "\"}}";
-            Log.d(TAG, postData);
-            Log.d(TAG, "----added get apps by user url---");
-            Log.d(TAG, "URL: " + urlIn);
+            Log.d(TAG,  "Cognito ID: " + cognitoId);
 
-            URL url = null;     //path for connection
+            URL url = null;
             try {
                 url = new URL(urlIn);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            try {
-                urlConnection = (HttpURLConnection) url.openConnection();       //open the connection
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "----Opened Connection---");
-            try {
-                urlConnection.setRequestMethod("GET");
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            }
-            urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                Log.d(TAG, "URL: " + urlIn);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                if(urlConnection.getInputStream() != null){
+                    BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    String line;
+                    StringBuilder builder = new StringBuilder();
+                    while ((line = in.readLine()) != null) {
+                        builder.append(line);
+                    }
 
-            urlConnection.setRequestProperty("Content-Length", ""+Integer.toString(postData.getBytes().length));
+                    Log.d(TAG, "response buffer: " + builder.toString());
 
-            urlConnection.setRequestProperty("Content-Language", "en-US");
+                    obj = new JSONObject(builder.toString());
+                    accounts = obj.getJSONArray("accounts");
+                } else {
+                    Log.d(TAG, "No input stream");
+                    return null;
+                }
 
-            urlConnection.setUseCaches(false);
-
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-
-            byte[] outputInBytes = new byte[0];
-            try {
-                outputInBytes = postData.getBytes("UTF-8");
-                Log.d(TAG, outputInBytes+"");
-            } catch (UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-            }
-            OutputStream os = null;
-            try {
-                os = urlConnection.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                os.write( outputInBytes );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                urlConnection.connect();        //finish the connection
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "----Connection Successful----");
-            InputStream inputStream = null;
-            int status = 0;
-            try {
-                status = urlConnection.getResponseCode();
-                Log.e(TAG, "Response Code: " + status);
-                Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if(status >= HttpURLConnection.HTTP_BAD_REQUEST)
-                    inputStream = urlConnection.getErrorStream();
-                else
-                    inputStream = urlConnection.getInputStream();
-                inputStream = urlConnection.getInputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "----reader----");
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            Log.d(TAG, "----Buffer----");
-            buffer = new StringBuffer();
-            Log.d(TAG, "----after Buffer----");
-            String line = "";
-           do {
-               try {
-                   line = reader.readLine();
-               } catch (IOException e) {
-                   e.printStackTrace();
-               }
-               buffer.append(line);
-           } while(line != null);
-
-            Log.d(TAG, "buffer: " + buffer.toString());
-            try {
-                obj = new JSONObject(buffer.toString());
-                accounts = obj.getJSONArray("accounts");
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } finally {
+                if(urlConnection != null) {
+                    urlConnection.disconnect();
+                }
             }
 
             apps.clear();

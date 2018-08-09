@@ -27,6 +27,14 @@ public class AuthenticatorActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator);
 
+        // Add a call to initialize AWSMobileClient
+//        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
+//            @Override
+//            public void onComplete(AWSStartupResult awsStartupResult) {
+//                SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
+//                signin.login(AuthenticatorActivity.this, MainActivity.class).execute();
+//            }
+//        }).execute();
 
         AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
             @Override

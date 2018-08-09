@@ -205,127 +205,9 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         mProgressDialog.show();
     }
 
-//    @Override
-//    protected Void doInBackground(Void... params) {
-//        //connect to API
-//        JSONObject obj = null;
-//        app.setDisplayName(displayName);
-//        app.setPlatform(platform);
-//        app.setUrl("http://facebook.com/" + userName);
-//
-//        String urlIn = "https://api.tc2pro.com/users";
-//        //  ArrayList<String> accounts = new ArrayList<>();
-//        JSONArray accounts = new JSONArray();
-//        String cognitoId = CredentialsManager.getInstance().getCognitoId();
-//        Log.d(TAG,  cognitoId);
-//
-//        String postData = "{\"user\": {\"cognitoId\": \"" + cognitoId + "\", \"displayName\": \"" + app.getDisplayName() + "\", \"platform\": \""
-//                + platform + "\", \"url\": \"" + app.getUrl() + "\"}}";
-//        Log.d(TAG, postData);
-//        Log.d(TAG, "----added get apps by user url---");
-//        Log.d(TAG, "URL: " + urlIn);
-//
-//        URL url = null;     //path for connection
-//        try {
-//            url = new URL(urlIn);
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            urlConnection = (HttpURLConnection) url.openConnection();       //open the connection
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Log.d(TAG, "----Opened Connection---");
-//        try {
-//            urlConnection.setRequestMethod("POST");
-//        } catch (ProtocolException e) {
-//            e.printStackTrace();
-//        }
-//
-//        urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-//        urlConnection.setRequestProperty("Content-Length", ""+Integer.toString(postData.getBytes().length));
-//        urlConnection.setRequestProperty("Content-Language", "en-US");
-//        urlConnection.setUseCaches(false);
-//        urlConnection.setDoInput(true);
-//        urlConnection.setDoOutput(true);
-//
-//        byte[] outputInBytes = new byte[0];
-//        try {
-//            outputInBytes = postData.getBytes("UTF-8");
-//            Log.d(TAG, outputInBytes+"");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//        OutputStream os = null;
-//        try {
-//            os = urlConnection.getOutputStream();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            os.write( outputInBytes );
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            os.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            urlConnection.connect();        //finish the connection
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Log.d(TAG, "----Connection Successful----");
-//        InputStream inputStream = null;
-//        int status = 0;
-//        try {
-//            status = urlConnection.getResponseCode();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            if(status >= HttpURLConnection.HTTP_BAD_REQUEST)
-//                inputStream = urlConnection.getErrorStream();
-//            else
-//                inputStream = urlConnection.getInputStream();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Log.d(TAG, "----reader----");
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-//        Log.d(TAG, "----Buffer----");
-//        StringBuffer buffer = new StringBuffer();
-//        Log.d(TAG, "----after Buffer----");
-//        String line = "";
-//        do {
-//            try {
-//                line = reader.readLine();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            buffer.append(line);
-//        } while(line != null);
-//
-//        Log.d(TAG, "buffer: " + buffer.toString());
-//        try {
-//            obj = new JSONObject(buffer.toString());
-//            //accounts = obj.getJSONArray("accounts");
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return null;
-//    }
-
      @Override
      protected Void doInBackground(Void... params) {
          HttpURLConnection httpcon;
-         String data = null;
-         String tempString = null;
          JSONObject tempObject = new JSONObject();
 
          String cognitoId = CredentialsManager.getInstance().getCognitoId();
@@ -351,6 +233,7 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
                  tempObject.put("displayName", displayName);
                  tempObject.put("platform", platform);
                  tempObject.put("url", userName);
+                 tempObject.put("isSwitchOn", true);
              } catch (JSONException j) {
                  j.printStackTrace();
              }

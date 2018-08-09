@@ -41,8 +41,7 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
         txtAppDisplayName.setText(singleApp.getDisplayName());
 
         Switch txtAppSwitch = (Switch) customView.findViewById(R.id.appSwitch);
-        txtAppSwitch.setChecked(Boolean.TRUE);
-        singleApp.setAppSwitchIsOn(true);
+        txtAppSwitch.setChecked(singleApp.isAppSwitchIsOn());
         txtAppSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -94,6 +93,18 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
         }
 
         return customView;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+
+        return getCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
     }
 
 }

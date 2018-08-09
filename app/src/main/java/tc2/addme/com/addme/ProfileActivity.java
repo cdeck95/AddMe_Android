@@ -24,16 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -154,7 +147,14 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                if(urlConnection.getInputStream() != null){
+
+                Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
+                Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
+                if (urlConnection.getResponseCode() == 404) {
+                    Log.e(TAG, "No accounts Found.");
+                }
+
+                if (urlConnection.getInputStream() != null) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                     String line;
                     StringBuilder builder = new StringBuilder();
@@ -170,7 +170,6 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                     Log.d(TAG, "No input stream");
                     return null;
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

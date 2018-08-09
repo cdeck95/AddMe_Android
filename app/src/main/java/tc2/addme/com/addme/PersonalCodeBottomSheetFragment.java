@@ -3,7 +3,9 @@ package tc2.addme.com.addme;
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -16,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.google.gson.JsonObject;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -23,6 +26,9 @@ import com.google.zxing.common.BitMatrix;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 
@@ -32,11 +38,34 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     ImageButton shareButton;
     ImageView imageView;
     ImageButton refreshButton;
+    JSONObject jsonObject;
+    View contentView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        contentView = View.inflate(getContext(), R.layout.personal_code_modal, null);
 
+
+        Bundle data = getArguments();
+        ArrayList<App> apps = data.getParcelableArrayList("apps");
+        HashMap<String, String> map = new HashMap<>();
+        if(apps.size() == 0){
+            Log.d(TAG, "no apps");
+        } else {
+            for(App app: apps) {
+                Log.d(TAG, app.toString());
+                if(app.isAppSwitchIsOn()){
+                    Log.d(TAG, "Will add to QR code...");
+                    map.put(app.getDisplayName(), app.getUrl());
+                }
+            }
+        }
+
+        jsonObject = new JSONObject(map);
+        Log.d(TAG, jsonObject.toString());
+        imageView = (ImageView) contentView.findViewById(R.id.qrCode);
+        RefreshQRCode(jsonObject);
     }
 
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
@@ -57,7 +86,6 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        final View contentView = View.inflate(getContext(), R.layout.personal_code_modal, null);
         dialog.setContentView(contentView);
 
         CoordinatorLayout.LayoutParams layoutParams =
@@ -67,13 +95,11 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
         }
 
-        imageView = (ImageView) contentView.findViewById(R.id.qrCode);
-
         refreshButton = (ImageButton) contentView.findViewById(R.id.refreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RefreshQRCode();
+                RefreshQRCode(jsonObject);
             }
         });
 
@@ -99,8 +125,6 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             }
         });
 
-
-        RefreshQRCode();
     }
 
 //    @Override
@@ -125,13 +149,15 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    void RefreshQRCode() {
+    void RefreshQRCode(JSONObject jsonObject) {
         try {
-            String tempString = createJSON().toString();
+            String tempString = jsonObject.toString();
+            Log.d(TAG, "QR code as string: \n" + tempString);
 
             Bitmap bm = TextToImageEncode(tempString);
 
             if (bm != null) {
+                Log.d(TAG, "Setting qr code...");
                 imageView.setImageBitmap(bm);
             }
         } catch (WriterException e) { //eek }

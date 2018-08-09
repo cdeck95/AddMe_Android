@@ -25,4 +25,8 @@
     </style>
     <!--splash theme end-->
 
+    <style name="ProgressBarStyle">
+        <item name="colorAccent">@color/colorAccent2</item>
+    </style>
+
 </resources>

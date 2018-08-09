@@ -46,9 +46,9 @@ public class AuthenticatorActivity extends Activity {
                             .userPools(true)  // true? show the Email and Password UI
                             .signInButton(FacebookButton.class) // Show Facebook button
                             .signInButton(GoogleButton.class) // Show Google button
-    //                        .logoResId(R.drawable.mylogo) // Change the logo
-                            .backgroundColor(Color.GRAY) // Change the backgroundColor
-//                            .isBackgroundColorFullScreen(true) // Full screen backgroundColor the backgroundColor full screenff
+                            .logoResId(R.mipmap.ic_launcher_2) // Change the logo
+                            .backgroundColor(R.color.colorPrimary) // Change the backgroundColor
+                            .isBackgroundColorFullScreen(false) // Full screen backgroundColor the backgroundColor full screenff
                             .fontFamily("sans-serif-light") // Apply sans-serif-light as the global font
                             .canCancel(true)
                             .build();
@@ -73,7 +73,7 @@ public class AuthenticatorActivity extends Activity {
             }
         });
 
-        showSignIn();
+        //showSignIn();
 
     }
 

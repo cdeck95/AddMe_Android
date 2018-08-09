@@ -105,8 +105,13 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     }
 
     private void populateApps(int i, View v) {
-        ListAdapter adapter = new CustomAppsAdapter(getContext(), 0, apps);
-        appList.setAdapter(adapter);
+        if(apps.size() == 0){
+            Log.d(TAG, "Apps list is empty");
+        } else {
+            ListAdapter adapter = new CustomAppsAdapter(getContext(), 0, apps);
+            appList.setAdapter(adapter);
+        }
+
     }
 
     @Override
@@ -151,51 +156,51 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                 Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
                 if (urlConnection.getResponseCode() == 404) {
                     Log.e(TAG, "No accounts Found.");
+                } else {
+                    if (urlConnection.getInputStream() != null) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line = in.readLine()) != null) {
+                            builder.append(line);
+                        }
+
+                        Log.d(TAG, "response buffer: " + builder.toString());
+
+                        obj = new JSONObject(builder.toString());
+                        accounts = obj.getJSONArray("accounts");
+                    } else {
+                        Log.d(TAG, "No input stream");
+                        return null;
+                    }
+                }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
                 }
 
-                if (urlConnection.getInputStream() != null) {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    String line;
-                    StringBuilder builder = new StringBuilder();
-                    while ((line = in.readLine()) != null) {
-                        builder.append(line);
+                apps.clear();
+
+                for(int n = 0; n < accounts.length(); n++)
+                {
+                    try {
+                        JSONObject object = accounts.getJSONObject(n);
+                        Integer id = Integer.parseInt(object.getString("accountId"));
+                        String displayName = object.getString("displayName");
+                        String appUrl = object.getString("url");
+                        String platform = object.getString("platform");
+                        String username = object.getString("username");
+                        App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
+                        apps.add(app);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
-                    Log.d(TAG, "response buffer: " + builder.toString());
-
-                    obj = new JSONObject(builder.toString());
-                    accounts = obj.getJSONArray("accounts");
-                } else {
-                    Log.d(TAG, "No input stream");
-                    return null;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if(urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-            }
-
-            apps.clear();
-
-            for(int n = 0; n < accounts.length(); n++)
-            {
-                try {
-                    JSONObject object = accounts.getJSONObject(n);
-                    Integer id = Integer.parseInt(object.getString("accountId"));
-                    String displayName = object.getString("displayName");
-                    String appUrl = object.getString("url");
-                    String platform = object.getString("platform");
-                    String username = object.getString("username");
-                    App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
-                    apps.add(app);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-            return null;
+                return null;
         }
 
         @Override

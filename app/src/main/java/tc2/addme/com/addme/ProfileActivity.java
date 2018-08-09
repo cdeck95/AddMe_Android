@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -44,12 +45,9 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     SwipeRefreshLayout swipeRefreshLayout;
     private Switch appSwitch;
     private ArrayList<App> apps;
-    private App app1, app2, app3, app4;
     private ImageButton imageButton;
     ProgressDialog mProgressDialog;
     HttpURLConnection urlConnection = null;
-    BufferedReader reader;
-    StringBuffer buffer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,7 +58,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         appList = (ListView) rootView.findViewById(R.id.appsListView);
         apps = new ArrayList<App>();
         appSwitch = (Switch) rootView.findViewById(R.id.appSwitch);
-        populateApps(1, rootView);
+
 
         appList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -95,7 +93,9 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             public void onClick(View v) {
                 //Initializing a bottom sheet
                 BottomSheetDialogFragment bottomSheetDialogFragment = new PersonalCodeBottomSheetFragment();
-
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("apps", apps);
+                bottomSheetDialogFragment.setArguments(bundle);
                 //show it
                 FragmentManager fm = getFragmentManager();
                 bottomSheetDialogFragment.show(fm, bottomSheetDialogFragment.getTag());
@@ -117,9 +117,8 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
-        Log.d(TAG, "----------in group list view on click listener---------------");
-        Snackbar.make(view, "Clicked", Snackbar.LENGTH_LONG).show();
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG, "On Item Click method params: " +  position + " " + id);
     }
 
     private class Networking extends AsyncTask<Void, Void, Void> {
@@ -185,12 +184,12 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             {
                 try {
                     JSONObject object = accounts.getJSONObject(n);
-                    Integer id = -1;
-                    //Integer id = object.getInt("cognitoId");
+                    Integer id = Integer.parseInt(object.getString("accountId"));
                     String displayName = object.getString("displayName");
                     String appUrl = object.getString("url");
                     String platform = object.getString("platform");
-                    App app = new App(id, displayName, platform, appUrl, Boolean.TRUE);
+                    String username = object.getString("username");
+                    App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
                     apps.add(app);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -205,8 +204,11 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             // populate list
             populateApps(1, getView());
             mProgressDialog.dismiss();
+
         }
     }
 
 
 }
+
+

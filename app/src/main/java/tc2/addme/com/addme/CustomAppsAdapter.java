@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -34,14 +35,22 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View customView = inflater.inflate(R.layout.custom_apps_row, parent, false);
 
-        App singleApp = getItem(position);
+        final App singleApp = getItem(position);
 
         TextView txtAppDisplayName = (TextView)customView.findViewById(R.id.txtAppDisplayName);
         txtAppDisplayName.setText(singleApp.getDisplayName());
 
         Switch txtAppSwitch = (Switch) customView.findViewById(R.id.appSwitch);
         txtAppSwitch.setChecked(Boolean.TRUE);
-        singleApp.setAppSwitchIsOn(txtAppSwitch.isActivated());
+        singleApp.setAppSwitchIsOn(true);
+        txtAppSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "Checked:" +  isChecked);
+                singleApp.setAppSwitchIsOn(isChecked);
+                Log.d(TAG, "Switch is on: " + singleApp.isAppSwitchIsOn());
+            }
+        });
 
 
         TextView txtAppID = (TextView) customView.findViewById(R.id.txtAppID);
@@ -61,13 +70,30 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
             case "Instagram":
                 appImage.setImageResource(R.mipmap.ic_instagram);
                 break;
-            default:
+            case "Snapchat":
+                appImage.setImageResource(R.mipmap.ic_snapchat);
+                break;
+            case "GooglePlus":
+                appImage.setImageResource(R.mipmap.ic_google_plus);
+                break;
+            case "LinkedIn":
+                appImage.setImageResource(R.mipmap.ic_linked_in);
+                break;
+            case "Xbox":
                 appImage.setImageResource(R.mipmap.ic_launcher);
+                break;
+            case "PSN":
+                appImage.setImageResource(R.mipmap.ic_launcher);
+                break;
+            case "Twitch":
+                appImage.setImageResource(R.mipmap.ic_launcher);
+                break;
+            default:
+                appImage.setImageResource(R.mipmap.ic_launcher); //need custom
                 break;
         }
 
         return customView;
     }
-
 
 }

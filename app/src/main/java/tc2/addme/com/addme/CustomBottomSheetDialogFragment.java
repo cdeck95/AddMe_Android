@@ -49,9 +49,11 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
     EditText username;
 
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {

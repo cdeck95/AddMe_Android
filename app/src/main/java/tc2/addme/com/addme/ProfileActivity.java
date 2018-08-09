@@ -20,10 +20,20 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -129,204 +139,64 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
               mProgressDialog.show();
         }
 
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            //connect to API
-//            JSONObject obj = null;
-//          //  ArrayList<String> accounts = new ArrayList<>();
-//            JSONArray accounts = new JSONArray();
-//            String cognitoId = CredentialsManager.getInstance().getCognitoId();
-//            String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
-//
-//            Log.d(TAG,  cognitoId);
-//            try {
-//                JSONObject jsonObject = new JSONObject("{}");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-////            parameters.put("cognitoId", cognitoId + "");
-//            String postData = "{\"user\": {\"cognitoId\": \"" + cognitoId + "\"}}";
-//            Log.d(TAG, postData);
-//            Log.d(TAG, "----added get apps by user url---");
-//            Log.d(TAG, "URL: " + urlIn);
-//
-//            URL url = null;     //path for connection
-//            try {
-//                url = new URL(urlIn);
-//            } catch (MalformedURLException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                urlConnection = (HttpURLConnection) url.openConnection();       //open the connection
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            Log.d(TAG, "----Opened Connection---");
-//            try {
-//                urlConnection.setRequestMethod("GET");
-//            } catch (ProtocolException e) {
-//                e.printStackTrace();
-//            }
-//            urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-//
-//            //urlConnection.setRequestProperty("Content-Length", ""+Integer.toString(postData.getBytes().length));
-//
-//            urlConnection.setRequestProperty("Content-Language", "en-US");
-//
-//            urlConnection.setUseCaches(false);
-//
-//            urlConnection.setDoInput(false);
-//            urlConnection.setDoOutput(true);
-//
-//            byte[] outputInBytes = new byte[0];
-//            try {
-//                outputInBytes = postData.getBytes("UTF-8");
-//                Log.d(TAG, outputInBytes+"");
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-////            OutputStream os = null;
-////            try {
-////                os = urlConnection.getOutputStream();
-////            } catch (IOException e) {
-////                e.printStackTrace();
-////            }
-////            try {
-////                os.write( outputInBytes );
-////            } catch (IOException e) {
-////                e.printStackTrace();
-////            }
-////            try {
-////                os.close();
-////            } catch (IOException e) {
-////                e.printStackTrace();
-////            }
-//
-////            try {
-////                urlConnection.connect();        //finish the connection
-////            } catch (IOException e) {
-////                e.printStackTrace();
-////            }
-//            Log.d(TAG, "----Connection Successful----");
-//            InputStream inputStream = null;
-//            int status = 0;
-//            try {
-////                status = urlConnection.getResponseCode();
-//                Log.e(TAG, "Response Code: " + status);
-//                Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                if(status != HttpURLConnection.HTTP_BAD_REQUEST)
-//                    inputStream = urlConnection.getErrorStream();
-//                else
-//                    inputStream = urlConnection.getInputStream();
-//            } catch (FileNotFoundException f){
-//                f.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            Log.d(TAG, "----reader----");
-//            reader = new BufferedReader(new InputStreamReader(inputStream));
-//            Log.d(TAG, "----Buffer----");
-//            buffer = new StringBuffer();
-//            Log.d(TAG, "----after Buffer----");
-//            String line = "";
-//           do {
-//               try {
-//                   line = reader.readLine();
-//               } catch (IOException e) {
-//                   e.printStackTrace();
-//               }
-//               buffer.append(line);
-//           } while(line != null);
-//
-//            Log.d(TAG, "buffer: " + buffer.toString());
-//            try {
-//                obj = new JSONObject(buffer.toString());
-//                if(obj.has("accounts")) {
-//                    accounts = obj.getJSONArray("accounts");
-//                }
-//                if(obj.has("error")){
-//                    Log.e(TAG, "Error:  " + obj.get("Error"));
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            apps.clear();
-//
-//            for(int n = 0; n < accounts.length(); n++)
-//            {
-//                try {
-//                    JSONObject object = accounts.getJSONObject(n);
-//                    Integer id = -1;
-//                    //Integer id = object.getInt("cognitoId");
-//                    String displayName = object.getString("displayName");
-//                    String appUrl = object.getString("url");
-//                    String platform = object.getString("platform");
-//                    App app = new App(id, displayName, platform, appUrl, Boolean.TRUE);
-//                    apps.add(app);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//            return null;
-//        }
-
         @Override
         protected Void doInBackground(Void... params) {
-            HttpURLConnection httpcon;
-            String data = null;
-            String result = null;
-            String tempString = null;
-
+            //connect to API
+            JSONObject obj = null;
+            JSONArray accounts = new JSONArray();
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
-            String url = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
+            String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
 
-            Log.e(TAG, "Retrieve Data URL: " + url);
+            Log.d(TAG,  "Cognito ID: " + cognitoId);
+
+            URL url = null;
             try {
-                //Connect
-                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
-                httpcon.setRequestProperty("Content-Type", "application/json");
-                httpcon.setRequestProperty("Accept", "application/json");
-                httpcon.setRequestMethod("GET");
-                httpcon.connect();
+                url = new URL(urlIn);
+                Log.d(TAG, "URL: " + urlIn);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                if(urlConnection.getInputStream() != null){
+                    BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    String line;
+                    StringBuilder builder = new StringBuilder();
+                    while ((line = in.readLine()) != null) {
+                        builder.append(line);
+                    }
 
-                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
-                Log.e(TAG, "Response Message: " + httpcon.getResponseMessage());
+                    Log.d(TAG, "response buffer: " + builder.toString());
 
-                if (httpcon.getResponseCode() != 404) {
-                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream());
+                    obj = new JSONObject(builder.toString());
+                    accounts = obj.getJSONArray("accounts");
                 } else {
-                    Log.e(TAG, "No Accounts found.");
+                    Log.d(TAG, "No input stream");
+                    return null;
                 }
 
-//                if (!empty) {
-//                    //Read
-//                    BufferedReader br = new BufferedReader(new InputStreamReader(httpcon.getInputStream(), "UTF-8"));
-//
-//                    String line = null;
-//                    StringBuilder sb = new StringBuilder();
-//
-//                    while ((line = br.readLine()) != null) {
-//                        sb.append(line);
-//                    }
-//
-//                    br.close();
-//                    result = sb.toString();
-//
-//                    Log.e(TAG, "Results: " + result);
-//                }
-
-            } catch (UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } finally {
+                if(urlConnection != null) {
+                    urlConnection.disconnect();
+                }
             }
-            //return url;
+
+            apps.clear();
+
+            for(int n = 0; n < accounts.length(); n++)
+            {
+                try {
+                    JSONObject object = accounts.getJSONObject(n);
+                    Integer id = -1;
+                    //Integer id = object.getInt("cognitoId");
+                    String displayName = object.getString("displayName");
+                    String appUrl = object.getString("url");
+                    String platform = object.getString("platform");
+                    App app = new App(id, displayName, platform, appUrl, Boolean.TRUE);
+                    apps.add(app);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
             return null;
         }
 

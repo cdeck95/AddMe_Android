@@ -51,7 +51,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="paddingPercent" value="40" />
+                                                <entry key="paddingPercent" value="10" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -64,8 +64,9 @@
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="cropped" value="true" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Desktop/AddMe/AddMe/Assets.xcassets/AddMeLogo-2.imageset/AddMeLogo-2.png" />
-                                      <entry key="outputName" value="ic_launcher_2" />
+                                      <entry key="iconShape" value="CIRCLE" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Desktop/custom.png" />
+                                      <entry key="outputName" value="ic_custom" />
                                     </map>
                                   </option>
                                 </PersistentState>

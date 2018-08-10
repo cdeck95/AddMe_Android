@@ -27,9 +27,13 @@ import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.auth.facebook.FacebookButton;
+import com.amazonaws.mobile.auth.google.GoogleButton;
+import com.amazonaws.mobile.auth.ui.AuthUIConfiguration;
 import com.amazonaws.mobile.auth.ui.SignInUI;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.regions.Regions;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.squareup.picasso.Picasso;
@@ -153,9 +157,15 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_logout) {
             IdentityManager.getDefaultIdentityManager().signOut();
+            showSignIn();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSignIn() {
+        Intent intent = new Intent(this, AuthenticatorActivity.class);
+        startActivity(intent);
     }
 
 //    /**

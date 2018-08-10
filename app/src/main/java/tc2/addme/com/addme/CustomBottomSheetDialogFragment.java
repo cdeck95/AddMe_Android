@@ -1,11 +1,12 @@
 package tc2.addme.com.addme;
 
-import android.app.AlertDialog;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,14 +14,16 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,14 +35,13 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
-    EditText displayName;
-    EditText username;
 
+    private static final String TAG = "AddAppActivity";
 
 
     @Override
@@ -68,28 +70,83 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         super.setupDialog(dialog, style);
         final View contentView = View.inflate(getContext(), R.layout.dialog_modal, null);
         dialog.setContentView(contentView);
-        ImageView facebookTV = (ImageView) contentView.findViewById(R.id.Facebook);
-        ImageView twitterTV = (ImageView) contentView.findViewById(R.id.Twitter);
-        ImageView instagramTV = (ImageView) contentView.findViewById(R.id.Instagram);
+        ImageView facebook = (ImageView) contentView.findViewById(R.id.Facebook);
+        ImageView twitter = (ImageView) contentView.findViewById(R.id.Twitter);
+        ImageView instagram = (ImageView) contentView.findViewById(R.id.Instagram);
+        ImageView snapchat = (ImageView) contentView.findViewById(R.id.Snapchat);
+        ImageView xbox = (ImageView) contentView.findViewById(R.id.xbox);
+        ImageView psn = (ImageView) contentView.findViewById(R.id.psn);
+        ImageView twitch = (ImageView) contentView.findViewById(R.id.twitch);
+        ImageView custom = (ImageView) contentView.findViewById(R.id.custom);
+        ImageView googlePlus = (ImageView) contentView.findViewById(R.id.googlePlus);
+        ImageView linkedIn = (ImageView) contentView.findViewById(R.id.LinkedIn);
 
-        facebookTV.setOnClickListener(new View.OnClickListener() {
+        facebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchAlertDialog("Facebook");
             }
         });
 
-        twitterTV.setOnClickListener(new View.OnClickListener() {
+        twitter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchAlertDialog("Twitter");
             }
         });
 
-        instagramTV.setOnClickListener(new View.OnClickListener() {
+        instagram.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchAlertDialog("Instagram");
+            }
+        });
+
+        snapchat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("Snapchat");
+            }
+        });
+
+        googlePlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("GooglePlus");
+            }
+        });
+
+        linkedIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("LinkedIn");
+            }
+        });
+        xbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("Xbox");
+            }
+        });
+
+        psn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("PSN");
+            }
+        });
+
+        twitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("Twitch");
+            }
+        });
+
+        custom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAlertDialog("Custom");
             }
         });
 
@@ -105,78 +162,37 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void launchAlertDialog(String platformIn) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
 
-        final String platform = platformIn;
-        // Set Custom Title
-        TextView title = new TextView(getContext());
-        // Title Properties
-        title.setText("Add Me");
-        title.setPadding(10, 10, 10, 10);   // Set Position
-        title.setGravity(Gravity.CENTER);
-        title.setTextColor(Color.BLACK);
-        title.setTextSize(20);
-        alertDialog.setCustomTitle(title);
-        LinearLayout layout = new LinearLayout(getContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.custom_dialog, null);
+        dialogBuilder.setView(dialogView);
 
-        // Set Message
-        displayName = new EditText(getApplicationContext());
-        // Message Properties
-        displayName.setHint("Display Name");
-        displayName.setGravity(Gravity.CENTER_HORIZONTAL);
-        displayName.setTextColor(Color.BLACK);
+        final EditText name = (EditText) dialogView.findViewById(R.id.displayName);
+        final EditText email = (EditText) dialogView.findViewById(R.id.username);
+        //final EditText message = (EditText) dialogView.findViewById(R.id.customFeedback);
 
-        // Set Message
-        username = new EditText(getApplicationContext());
-        // Message Properties
-        username.setHint("Username");
-        username.setGravity(Gravity.CENTER_HORIZONTAL);
-        username.setTextColor(Color.BLACK);
+        dialogBuilder.setTitle("Add Account");
+        dialogBuilder.setMessage("Please enter details...");
+        dialogBuilder.setPositiveButton("Add", (dialog, whichButton) -> {
+            String displayName = name.getText().toString().trim();
+            String username = email.getText().toString();
+           // String messageStr = message.getText().toString().trim();
+            Log.d(TAG, displayName);
+            Log.d(TAG, username);
+            new Networking(getActivity(), username, displayName, platformIn).execute();
 
-        layout.addView(displayName);
-        layout.addView(username);
-
-        alertDialog.setView(layout);
-
-        // Set Button
-        // you can more buttons
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-
+        });
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //pass
             }
         });
 
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Add", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                String userName = username.getText().toString();
-                String display_name = displayName.getText().toString();
-                Log.d("Add App", userName);
-                Log.d("Add App", display_name);
-                new Networking(getActivity(), userName, display_name, platform).execute();
-            }
-        });
-
-
-
-        new Dialog(getApplicationContext());
-        alertDialog.show();
-
-        // Set Properties for OK Button
-        final Button okBT = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-        LinearLayout.LayoutParams neutralBtnLP = (LinearLayout.LayoutParams) okBT.getLayoutParams();
-        neutralBtnLP.gravity = Gravity.FILL_HORIZONTAL;
-        okBT.setPadding(50, 10, 10, 10);   // Set Position
-        okBT.setTextColor(Color.BLUE);
-        okBT.setLayoutParams(neutralBtnLP);
-
-        final Button cancelBT = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        LinearLayout.LayoutParams negBtnLP = (LinearLayout.LayoutParams) okBT.getLayoutParams();
-        negBtnLP.gravity = Gravity.FILL_HORIZONTAL;
-        cancelBT.setTextColor(Color.RED);
-        cancelBT.setLayoutParams(negBtnLP);
+        AlertDialog b = dialogBuilder.create();
+        b.show();
     }
-}
+    }
 
  class Networking extends AsyncTask<Void, Void, Void> {
         String title;
@@ -232,8 +248,45 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
                  tempObject.put("username", userName);
                  tempObject.put("displayName", displayName);
                  tempObject.put("platform", platform);
-                 tempObject.put("url", userName);
+                 switch(platform) {
+                     case "Facebook":
+                        tempObject.put("url",  "https://www.facebook.com/" + (userName));
+                        break;
+                     case "Twitter":
+                         tempObject.put("url",  "https://www.twitter.com/" + (userName));
+                         break;
+                     case "Instagram":
+                         tempObject.put("url",  "https://www.instagram.com/" + (userName));
+                         break;
+                     case "Snapchat":
+                         tempObject.put("url",  "https://www.snapchat.com/add/" + (userName));
+                         break;
+                     case "LinkedIn":
+                         tempObject.put("url",  "https://www.linkedin.com/in/" + (userName));
+                         break;
+                     case "GooglePlus":
+                         tempObject.put("url",  "https://www.plus.google.com/" + (userName));
+                         break;
+                     case "Xbox":
+                         String usernameURL = URLEncoder.encode(userName, "utf-8");
+                         tempObject.put("url",  "https://account.xbox.com/en-us/Profile?GamerTag=" + (usernameURL));
+                         break;
+                     case "PSN":
+                         usernameURL = URLEncoder.encode(userName, "utf-8");
+                         tempObject.put("url",  "https://my.playstation.com/profile/" + (usernameURL));
+                         break;
+                     case "Twitch":
+                         tempObject.put("url",  "https://m.twitch.tv/" + userName + "/profile");
+                         break;
+                     case "Custom":
+                         tempObject.put("url", userName);
+                         break;
+                     default:
+                         Log.d(TAG, "unknown app found: " + platform);
+                 }
+
                  tempObject.put("isSwitchOn", true);
+                 Log.d(TAG, tempObject.toString());
              } catch (JSONException j) {
                  j.printStackTrace();
              }
@@ -269,5 +322,18 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         // populate list
         mProgressDialog.dismiss();
         Log.d(TAG, "App added: " + app.toString());
+        new DroidDialog.Builder(mcontext)
+                .icon(R.drawable.ic_action_tick)
+                .title("Success!")
+                .content("Your account has been added to the database.")
+                .cancelable(true, true)
+                .neutralButton("DISMISS", droidDialog -> {
+                    droidDialog.dismiss();
+                    Toast.makeText(mcontext, "Skip", Toast.LENGTH_SHORT).show();
+                })
+                .show();
+
     }
+
+
 }

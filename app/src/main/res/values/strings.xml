@@ -22,5 +22,11 @@
     <string name="sign_in_with">Sign in with</string>
     <string name="sign_in_username">Username</string>
 
+
+    <string name="display_name">Custom Display Name:</string>
+    <string name="username">Username:</string>
+    <string name="custom_feedback">your message:</string>
+
+
     <string name="sign_in_message">"You successfully signed-in as %s."</string>
 </resources>

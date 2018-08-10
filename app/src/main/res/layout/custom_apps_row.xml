@@ -8,9 +8,12 @@
     android:weightSum="1">
 
     <android.support.v7.widget.CardView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
         android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent"
+        app:cardBackgroundColor="@android:color/transparent"
         app:cardCornerRadius="8dp">
 
         <android.support.constraint.ConstraintLayout
@@ -31,12 +34,12 @@
                 android:paddingLeft="8dp"
                 android:text="@string/default_app_display_name"
                 android:textAlignment="viewStart"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/colorPrimaryDark"
+                app:layout_constraintBaseline_toBaselineOf="@+id/appSwitch"
                 app:layout_constraintLeft_toRightOf="@+id/imageView"
                 app:layout_constraintRight_toLeftOf="@+id/appSwitch"
-                app:layout_constraintBaseline_toBaselineOf="@+id/appSwitch"
                 tools:layout_editor_absoluteX="82dp" />
 
             <ImageView
@@ -61,20 +64,20 @@
                 android:id="@+id/txtAppID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:focusableInTouchMode="false"
-                android:clickable="false"
-                android:focusable="false"
-                android:descendantFocusability="blocksDescendants"
-                android:visibility="gone"
-                android:text="@string/default_app_id"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginBottom="8dp"
-                android:layout_marginRight="8dp"
-                app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginLeft="8dp"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:clickable="false"
+                android:descendantFocusability="blocksDescendants"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:text="@string/default_app_id"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Switch
                 android:id="@+id/appSwitch"

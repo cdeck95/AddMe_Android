@@ -29,4 +29,12 @@
 
 
     <string name="sign_in_message">"You successfully signed-in as %s."</string>
+
+    <string-array name="help_choices">
+        <item>"Can't connect accounts"</item>
+        <item>"Can't create QR code"</item>
+        <item>"QR code is wrong"</item>
+        <item>"Can't scan/import QR Code"</item>
+        <item>"Can't edit/delete apps"</item>
+    </string-array>
 </resources>

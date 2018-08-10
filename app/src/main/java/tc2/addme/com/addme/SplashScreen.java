@@ -1,15 +1,17 @@
 package tc2.addme.com.addme;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.support.v7.app.ActionBar;
+import com.appus.splash.Splash;
 
-import java.math.RoundingMode;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Splash extends AppCompatActivity{
+public class SplashScreen extends AppCompatActivity{
     private Timer timer;
     private ProgressBar progressBar;
     private int i=0;
@@ -18,7 +20,7 @@ public class Splash extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splash_activity);
+        setContentView(R.layout.activity_main);
         progressBar=(ProgressBar)findViewById(R.id.progressBar);
         progressBar.setProgress(0);
         textView=(TextView)findViewById(R.id.textView);
@@ -45,10 +47,10 @@ public class Splash extends AppCompatActivity{
                 }else{
                     //closing the timer
                     timer.cancel();
-                    Intent intent =new Intent(Splash.this,AuthenticatorActivity.class);
+                    Intent intent =new Intent(SplashScreen.this,AuthenticatorActivity.class);
                     startActivity(intent);
                     // close this activity
-                    finish();
+                   // finish();
                 }
             }
         }, 0, period);

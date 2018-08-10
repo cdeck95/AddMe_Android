@@ -1,10 +1,8 @@
 package tc2.addme.com.addme;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
@@ -46,9 +44,9 @@ public class AuthenticatorActivity extends Activity {
                             .userPools(true)  // true? show the Email and Password UI
                             .signInButton(FacebookButton.class) // Show Facebook button
                             .signInButton(GoogleButton.class) // Show Google button
-                            .logoResId(R.mipmap.ic_launcher_2) // Change the logo
-                            .backgroundColor(R.color.colorPrimary) // Change the backgroundColor
-                            .isBackgroundColorFullScreen(false) // Full screen backgroundColor the backgroundColor full screenff
+                            .logoResId(R.mipmap.ic_launcher) // Change the logo
+                            .backgroundColor(Color.WHITE) // Change the backgroundColor
+                            .isBackgroundColorFullScreen(true) // Full screen backgroundColor the backgroundColor full screenff
                             .fontFamily("sans-serif-light") // Apply sans-serif-light as the global font
                             .canCancel(true)
                             .build();

@@ -51,6 +51,7 @@ dependencies {
     implementation ('com.amazonaws:aws-android-sdk-auth-google:2.6.+@aar') { transitive = true }
 
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'de.cketti.mailto:email-intent-builder:1.0.0'
 
     // Picasso Images
     implementation 'com.squareup.picasso:picasso:2.5.2'

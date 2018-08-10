@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.cketti.mailto.EmailIntentBuilder;
+
 public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment implements ProgressGenerator.OnCompleteListener {
 
     private static final String TAG = "AddAppActivity";
@@ -76,15 +78,25 @@ public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
           //  btnSignIn.setMode(ActionProcessButton.Mode.PROGRESS);
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressGenerator.start(btnSignIn);
-                btnSignIn.setEnabled(false);
-                helpTV.setEnabled(false);
-                niceSpinner.setEnabled(false);
+        btnSignIn.setOnClickListener(v -> {
+            progressGenerator.start(btnSignIn);
+            btnSignIn.setEnabled(false);
+            helpTV.setEnabled(false);
+            niceSpinner.setEnabled(false);
+
+            boolean success = EmailIntentBuilder.from(getActivity())
+                    .to("support@tc2pro.com")
+                    .subject("" + dataset.get(niceSpinner.getSelectedIndex()))
+                    .body(""+ helpTV.getText().toString())
+                    .start();
+            if(success){
+                btnSignIn.setEnabled(true);
+                helpTV.setEnabled(true);
+                niceSpinner.setEnabled(true);
             }
         });
+
+
     }
 
     @Override

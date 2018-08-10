@@ -3,6 +3,8 @@ package tc2.addme.com.addme;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
@@ -14,9 +16,10 @@ import com.amazonaws.mobile.auth.ui.SignInUI;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
+import com.appus.splash.Splash;
+import android.support.v7.app.ActionBar;
 
-
-public class AuthenticatorActivity extends Activity {
+public class AuthenticatorActivity extends AppCompatActivity {
 
     private static final String TAG = "AUTHENTICATOR_ACTIVITY";
 
@@ -25,53 +28,35 @@ public class AuthenticatorActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator);
 
-        // Add a call to initialize AWSMobileClient
-//        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
-//            @Override
-//            public void onComplete(AWSStartupResult awsStartupResult) {
-//                SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
-//                signin.login(AuthenticatorActivity.this, MainActivity.class).execute();
-//            }
-//        }).execute();
+        Splash.Builder splash = new Splash.Builder(this, getSupportActionBar());
+        splash.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        // splash.setBackgroundImage(ContextCompat.getDrawable(this, R.drawable.splash));
+        //splash.setSplashImage(ContextCompat.getDrawable(this, R.mipmap.ic_launcher_horizontal));
+        splash.perform();
+
+
 
         AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
             @Override
             public void onComplete(AWSStartupResult awsStartupResult) {
-//                SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
-//                signin.login(AuthenticatorActivity.this, MainActivity.class).execute();
-                AuthUIConfiguration config =
-                    new AuthUIConfiguration.Builder()
-                            .userPools(true)  // true? show the Email and Password UI
-                            .signInButton(FacebookButton.class) // Show Facebook button
-                            .signInButton(GoogleButton.class) // Show Google button
-                            .logoResId(R.mipmap.ic_launcher) // Change the logo
-                            .backgroundColor(Color.WHITE) // Change the backgroundColor
-                            .isBackgroundColorFullScreen(true) // Full screen backgroundColor the backgroundColor full screenff
-                            .fontFamily("sans-serif-light") // Apply sans-serif-light as the global font
-                            .canCancel(true)
-                            .build();
-                SignInUI signinUI = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
-                signinUI.login(AuthenticatorActivity.this, MainActivity.class).authUIConfiguration(config).execute();
-            }
-        }).execute();
 
-        // Sign-in listener
-        IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
-            @Override
-            public void onUserSignedIn() {
-                Log.d(TAG, "User Signed In");
-            }
+            // Sign-in listener
+            IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
+                @Override
+                public void onUserSignedIn() {
+                    Log.d(TAG, "User Signed In");
+                }
 
-            // Sign-out listener
-            @Override
-            public void onUserSignedOut() {
+                // Sign-out listener
+                @Override
+                public void onUserSignedOut() {
 
-                Log.d(TAG, "User Signed Out");
-                showSignIn();
-            }
-        });
+                    Log.d(TAG, "User Signed Out");
+                    showSignIn();
+                }
+            });
 
-        //showSignIn();
+        showSignIn();
 
     }
 
@@ -79,7 +64,21 @@ public class AuthenticatorActivity extends Activity {
      * Display the AWS SDK sign-in/sign-up UI
      */
     private void showSignIn() {
-        SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
-        signin.login(AuthenticatorActivity.this, MainActivity.class).execute();
+        AuthUIConfiguration config =
+                new AuthUIConfiguration.Builder()
+                        .userPools(true)  // true? show the Email and Password UI
+                        .signInButton(FacebookButton.class) // Show Facebook button
+                        .signInButton(GoogleButton.class) // Show Google button
+                        .logoResId(R.mipmap.ic_launcher) // Change the logo
+                        .backgroundColor(Color.WHITE) // Change the backgroundColor
+                        .isBackgroundColorFullScreen(true) // Full screen backgroundColor the backgroundColor full screenff
+                        .fontFamily("sans-serif-light") // Apply sans-serif-light as the global font
+                        .canCancel(true)
+                        .build();
+        SignInUI signinUI = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
+        signinUI.login(AuthenticatorActivity.this, MainActivity.class).authUIConfiguration(config).execute();
+    }
+        }).execute();
+
     }
 }

@@ -12,9 +12,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,23 +22,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
-import com.amazonaws.mobile.auth.facebook.FacebookButton;
-import com.amazonaws.mobile.auth.google.GoogleButton;
-import com.amazonaws.mobile.auth.ui.AuthUIConfiguration;
-import com.amazonaws.mobile.auth.ui.SignInUI;
-import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.regions.Regions;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
 
         //AWSMobileClient.getInstance().initialize(this).execute();
 
@@ -155,18 +148,19 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_help) {
+            //Initializing a bottom sheet
+            BottomSheetDialogFragment bottomSheetDialogFragment = new HelpBottomSheetDialogFragment();
+            //show it
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         } else if (id == R.id.action_logout) {
+            //IdentityManager.getDefaultIdentityManager().signOut();
             IdentityManager.getDefaultIdentityManager().signOut();
-            showSignIn();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showSignIn() {
-        Intent intent = new Intent(this, AuthenticatorActivity.class);
-        startActivity(intent);
-    }
 
 //    /**
 //     * A placeholder fragment containing a simple view.

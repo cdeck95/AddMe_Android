@@ -1,6 +1,5 @@
 package tc2.addme.com.addme;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +7,7 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,11 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+
 public class ProfileActivity extends Fragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = "ProfileActivity";
@@ -39,8 +41,9 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     private Switch appSwitch;
     private ArrayList<App> apps;
     private ImageButton imageButton;
-    ProgressDialog mProgressDialog;
+    //ProgressDialog mProgressDialog;
     HttpURLConnection urlConnection = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,6 +78,10 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                 new Networking(getContext()).execute();
                 //populateApps(1, rootView);
                 swipeRefreshLayout.setRefreshing(false);
+                final Snackbar snackBar = Snackbar.make(getView(), "Refreshed", Snackbar.LENGTH_SHORT);
+                snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+                snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+                snackBar.show();
             }
         });
 
@@ -122,6 +129,8 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     private class Networking extends AsyncTask<Void, Void, Void> {
         String title;
         Context mcontext;
+        MaterialDialog dialog;
+
 
         public Networking(Context c){
               mcontext=c;
@@ -129,11 +138,20 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-              mProgressDialog = new ProgressDialog(mcontext);
-              mProgressDialog.setTitle("Contacting Server");
-              mProgressDialog.setMessage("Loading...");
-              mProgressDialog.setIndeterminate(false);
-              mProgressDialog.show();
+
+
+            dialog = new MaterialDialog.Builder(mcontext)
+                    .title("Contacting Server")
+                    .content("Loading...")
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .show();
+
+//              mProgressDialog = new ProgressDialog(mcontext);
+//              mProgressDialog.setTitle("Contacting Server");
+//              mProgressDialog.setMessage("Loading...");
+//              mProgressDialog.setIndeterminate(false);
+//              mProgressDialog.show();
         }
 
         @Override
@@ -207,7 +225,8 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         protected void onPostExecute(Void result) {
             // populate list
             populateApps(1, getView());
-            mProgressDialog.dismiss();
+            //mProgressDialog.dismiss();
+            dialog.dismiss();
 
         }
     }

@@ -14,6 +14,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
@@ -180,7 +182,7 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
            // String messageStr = message.getText().toString().trim();
             Log.d(TAG, displayName);
             Log.d(TAG, username);
-            new Networking(getActivity(), username, displayName, platformIn).execute();
+            new Networking(getView(), getActivity(), username, displayName, platformIn).execute();
 
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -197,6 +199,7 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
  class Networking extends AsyncTask<Void, Void, Void> {
         String title;
         Context mcontext;
+        View mView;
         String userName, displayName, platform;
         App app;
         ProgressDialog mProgressDialog;
@@ -204,8 +207,9 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         HttpURLConnection urlConnection = null;
 
 
-    public Networking(Context c, String userName, String display_name, String platform){
+    public Networking(View v, Context c, String userName, String display_name, String platform){
         mcontext=c;
+        mView=v;
         this.userName = userName;
         this.displayName = display_name;
         this.platform = platform;
@@ -329,11 +333,11 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
                 .cancelable(true, true)
                 .neutralButton("DISMISS", droidDialog -> {
                     droidDialog.dismiss();
-                    Toast.makeText(mcontext, "Skip", Toast.LENGTH_SHORT).show();
-                })
-                .show();
-
+                    final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
+                    snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+                    snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
+                    snackBar.show();
+                });
     }
-
 
 }

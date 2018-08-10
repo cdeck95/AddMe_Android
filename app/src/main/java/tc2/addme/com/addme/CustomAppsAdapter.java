@@ -80,16 +80,16 @@ public class CustomAppsAdapter extends ArrayAdapter<App>  {
                 appImage.setImageResource(R.mipmap.ic_linked_in);
                 break;
             case "Xbox":
-                appImage.setImageResource(R.mipmap.ic_launcher);
+                appImage.setImageResource(R.mipmap.xbox);
                 break;
             case "PSN":
-                appImage.setImageResource(R.mipmap.ic_launcher);
+                appImage.setImageResource(R.mipmap.ic_psn);
                 break;
             case "Twitch":
-                appImage.setImageResource(R.mipmap.ic_launcher);
+                appImage.setImageResource(R.mipmap.ic_twitch);
                 break;
             default:
-                appImage.setImageResource(R.mipmap.ic_launcher); //need custom
+                appImage.setImageResource(R.mipmap.ic_custom); //need custom
                 break;
         }
 

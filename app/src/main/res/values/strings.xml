@@ -13,7 +13,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="default_app_id">-1</string>
     <string name="default_app_display_name">\"Error Loading App\"</string>
-    <string name="default_app_platform">Unkown</string>
+    <string name="default_app_platform">Unknown</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_sign_in">Sign-in</string>
     <string name="sign_in_succeeded_message_format">"Sign-in with %s succeeded."</string>

@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,16 +12,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.droidbyme.dialoglib.DroidDialog;
 
@@ -332,12 +326,13 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
                 .content("Your account has been added to the database.")
                 .cancelable(true, true)
                 .neutralButton("DISMISS", droidDialog -> {
-                    droidDialog.dismiss();
-                    final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
-                    snackBar.setAction("Dismiss", v -> snackBar.dismiss());
-                    snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
-                    snackBar.show();
-                });
+            droidDialog.dismiss();
+//            final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
+//            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+//            snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
+//            snackBar.show();
+        }).show();
+
     }
 
 }

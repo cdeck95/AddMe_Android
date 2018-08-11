@@ -114,7 +114,9 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     private void populateApps(int i, View v) {
         if(apps.size() == 0){
             Log.d(TAG, "Apps list is empty");
+            appList.setVisibility(View.INVISIBLE);
         } else {
+            appList.setVisibility(View.VISIBLE);
             ListAdapter adapter = new CustomAppsAdapter(getContext(), 0, apps);
             appList.setAdapter(adapter);
         }

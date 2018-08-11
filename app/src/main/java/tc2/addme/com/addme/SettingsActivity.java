@@ -16,6 +16,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +48,18 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
             deleteAllBtn = findViewById(R.id.deleteAllBtn2);
             deleteAllBtn.setOnClickListener(v -> {
-                new SettingsActivity.Networking(this).execute("DELETE");
+                new DroidDialog.Builder(this)
+                        .icon(R.drawable.ic_action_close)
+                        .title("Woah!")
+                        .content("You're about to delete all of your accounts. Are you sure you want to do that?")
+                        .cancelable(true, true)
+                        .positiveButton("CANCEL",  droidDialog -> {
+                            droidDialog.dismiss();
+                        })
+                        .negativeButton("DELETE", droidDialog -> {
+                            droidDialog.dismiss();
+                            new SettingsActivity.Networking(this).execute("DELETE");
+                        }).show();
             });
 
 

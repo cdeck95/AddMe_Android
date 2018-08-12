@@ -50,10 +50,10 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.profile_tab, container, false);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-        appList = (ListView) rootView.findViewById(R.id.appsListView);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        appList = rootView.findViewById(R.id.appsListView);
         apps = new ArrayList<App>();
-        appSwitch = (Switch) rootView.findViewById(R.id.appSwitch);
+        appSwitch = rootView.findViewById(R.id.appSwitch);
 
 
         appList.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -86,7 +86,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         });
 
 
-        imageButton = (ImageButton) rootView.findViewById(R.id.imageButton);
+        imageButton = rootView.findViewById(R.id.imageButton);
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override

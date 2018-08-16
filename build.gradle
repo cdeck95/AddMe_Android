@@ -24,6 +24,9 @@ allprojects {
             url 'https://dl.bintray.com/roman-voronoy/maven/'
         }
         maven { url "https://jitpack.io" }
+        maven {
+            url "https://maven.google.com"
+        }
 
         jcenter()
 

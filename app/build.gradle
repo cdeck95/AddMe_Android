@@ -58,6 +58,9 @@ dependencies {
     implementation 'pro.appus:zoom-splash:1.0.0'
     implementation 'com.github.arcadefire:nice-spinner:1.3.4'
 
+    implementation 'com.google.android.gms:play-services-ads:15.0.0'
+    implementation 'com.github.amlcurran.showcaseview:library:5.4.3'
+
 
     implementation 'com.github.droidbyme:DroidDialog:c6decc7167'
     implementation 'com.android.support:appcompat-v7:27.1.1'

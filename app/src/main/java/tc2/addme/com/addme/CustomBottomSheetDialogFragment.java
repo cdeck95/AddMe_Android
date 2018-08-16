@@ -12,12 +12,15 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.droidbyme.dialoglib.DroidDialog;
 
@@ -66,16 +69,21 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         super.setupDialog(dialog, style);
         final View contentView = View.inflate(getContext(), R.layout.dialog_modal, null);
         dialog.setContentView(contentView);
-        ImageView facebook = (ImageView) contentView.findViewById(R.id.Facebook);
-        ImageView twitter = (ImageView) contentView.findViewById(R.id.Twitter);
-        ImageView instagram = (ImageView) contentView.findViewById(R.id.Instagram);
-        ImageView snapchat = (ImageView) contentView.findViewById(R.id.Snapchat);
-        ImageView xbox = (ImageView) contentView.findViewById(R.id.xbox);
-        ImageView psn = (ImageView) contentView.findViewById(R.id.psn);
-        ImageView twitch = (ImageView) contentView.findViewById(R.id.twitch);
-        ImageView custom = (ImageView) contentView.findViewById(R.id.custom);
-        ImageView googlePlus = (ImageView) contentView.findViewById(R.id.googlePlus);
-        ImageView linkedIn = (ImageView) contentView.findViewById(R.id.LinkedIn);
+        TextView facebook = contentView.findViewById(R.id.Facebook);
+        facebook.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_facebook), null, null);
+        TextView twitter = contentView.findViewById(R.id.Twitter);
+        twitter.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_twitter), null, null);
+        TextView instagram = contentView.findViewById(R.id.Instagram);
+        instagram.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_instagram), null, null);
+        instagram.setGravity(Gravity.BOTTOM);
+        TextView snapchat = contentView.findViewById(R.id.Snapchat);
+        snapchat.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_snapchat), null, null);
+        ImageView xbox = contentView.findViewById(R.id.xbox);
+        ImageView psn = contentView.findViewById(R.id.psn);
+        ImageView twitch = contentView.findViewById(R.id.twitch);
+        ImageView custom = contentView.findViewById(R.id.custom);
+        ImageView googlePlus = contentView.findViewById(R.id.googlePlus);
+        ImageView linkedIn = contentView.findViewById(R.id.LinkedIn);
 
         facebook.setOnClickListener(new View.OnClickListener() {
             @Override

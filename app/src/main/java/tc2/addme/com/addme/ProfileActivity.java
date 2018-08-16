@@ -21,6 +21,9 @@ import android.widget.ListView;
 import android.widget.Switch;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -109,6 +112,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         new Networking(getContext()).execute();
+
     }
 
     private void populateApps(int i, View v) {

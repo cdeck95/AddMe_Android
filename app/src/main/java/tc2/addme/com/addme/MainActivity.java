@@ -12,11 +12,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.regions.Regions;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -25,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MAIN_ACTIVITY";
     ImageButton imageButton;
+    PublisherAdView mPublisherAdView;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -39,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    private FloatingActionButton addAppButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        addAppButton = findViewById(R.id.fab);
 
 
         //AWSMobileClient.getInstance().initialize(this).execute();
@@ -94,6 +103,25 @@ public class MainActivity extends AppCompatActivity {
             //Picasso.with(getApplicationContext()).load(personPhoto).into(imageView);
         }
 
+        mPublisherAdView = findViewById(R.id.publisherAdView);
+        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().addTestDevice("B3EEABB8EE11C2BE770B684D95219ECB").build();
+        mPublisherAdView.loadAd(adRequest);
+
+        Button customButton = new Button(this);
+        customButton.setText("");
+        customButton.setEnabled(false);
+        customButton.setVisibility(View.GONE);
+
+        ViewTarget target = new ViewTarget(R.id.fab, this);
+        new ShowcaseView.Builder(this)
+                .setTarget(target)
+                .setContentTitle("Let's get started!")
+                .setContentText("Click the plus button to add an account!")
+                .hideOnTouchOutside()
+                .setStyle(R.style.CustomShowcaseTheme2)
+                .replaceEndButton(customButton)
+
+                .build();
 
 
     }

@@ -76,9 +76,10 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
                             JSONObject tempObject = accounts.getJSONObject(i);
                             //Log.e(TAG, "tempObject: " + tempObject.get("platform"));
                             if (tempObject.getString("platform").equals("Facebook")) {
-                                Log.e(TAG, "Facebook Link: " + Uri.parse(tempObject.getString("url").toLowerCase()));
+                                String tempString = tempObject.getString("url");
+                                Log.e(TAG, "Facebook Link: " + Uri.parse("fb://facewebmodal/f?href=" + tempString));
 
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tempObject.getString("url").toLowerCase()));
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + tempString.toLowerCase()));
                                 startActivity(browserIntent);
                             }
                         }

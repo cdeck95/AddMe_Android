@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,8 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -17,38 +18,44 @@ import java.util.ArrayList;
  * Created by cdeck_000 on 4/4/2017.
  */
 
-public class CustomEditAppsAdapter extends ArrayAdapter<App>  {
+public class CustomAppsAdapter extends ArrayAdapter<App> {
 
     private static final String TAG = "CustomGroupsAdapter";
 
-    public CustomEditAppsAdapter(Context context, int resource, ArrayList<App> apps) {
+    public CustomAppsAdapter(Context context, int resource, ArrayList<App> apps) {
         super(context, resource, apps);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        View customView = inflater.inflate(R.layout.custom_edit_apps_rows, parent, false);
+        View customView = inflater.inflate(R.layout.custom_apps_row, parent, false);
 
         final App singleApp = getItem(position);
 
-        TextView txtAppDisplayName = customView.findViewById(R.id.txtAppDisplayName2);
+        TextView txtAppDisplayName = customView.findViewById(R.id.txtAppDisplayName);
         txtAppDisplayName.setText(singleApp.getDisplayName());
 
-        Button editApp = customView.findViewById(R.id.editBtn2);
-        editApp.setOnClickListener(v -> {
-            Log.d(TAG, "Edit Button pressed");
+        Switch txtAppSwitch = customView.findViewById(R.id.appSwitch);
+        txtAppSwitch.setChecked(singleApp.isAppSwitchIsOn());
+        txtAppSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "Checked:" + isChecked);
+                singleApp.setAppSwitchIsOn(isChecked);
+                Log.d(TAG, "Switch is on: " + singleApp.isAppSwitchIsOn());
+            }
         });
 
-        TextView txtAppID = customView.findViewById(R.id.txtAppID2);
+
+        TextView txtAppID = customView.findViewById(R.id.txtAppID);
         String appID = singleApp.getAppID() + "";
         txtAppID.setText(appID);
 
-        ImageView appImage = customView.findViewById(R.id.imageView2);
+        ImageView appImage = customView.findViewById(R.id.imageView);
         String platform = singleApp.getPlatform();
 
-        switch (platform){
+        switch (platform) {
             case "Facebook":
                 appImage.setImageResource(R.mipmap.ic_facebook);
                 break;

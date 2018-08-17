@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -38,13 +38,12 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     private static final String TAG = "ProfileActivity";
     ListView appList;
     SwipeRefreshLayout swipeRefreshLayout;
-    private Switch appSwitch;
-    private ArrayList<App> apps;
-    private ImageButton imageButton;
     //ProgressDialog mProgressDialog;
     HttpURLConnection urlConnection = null;
     SharedPreferences prefs;
-
+    private Switch appSwitch;
+    private ArrayList<App> apps;
+    private ImageButton imageButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,7 +115,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     }
 
     private void populateApps(int i, View v) {
-        if(apps.size() == 0){
+        if (apps.size() == 0) {
             Log.d(TAG, "Apps list is empty");
             appList.setVisibility(View.INVISIBLE);
         } else {
@@ -129,7 +128,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG, "On Item Click method params: " +  position + " " + id);
+        Log.d(TAG, "On Item Click method params: " + position + " " + id);
     }
 
     private class Networking extends AsyncTask<Void, Void, Void> {
@@ -138,9 +137,10 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         MaterialDialog dialog;
 
 
-        public Networking(Context c){
-              mcontext=c;
+        public Networking(Context c) {
+            mcontext = c;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -168,7 +168,7 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
             String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
 
-            Log.d(TAG,  "Cognito ID: " + cognitoId);
+            Log.d(TAG, "Cognito ID: " + cognitoId);
 
             URL url = null;
             try {
@@ -200,33 +200,32 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                         return null;
                     }
                 }
-                } catch (Exception e) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+
+            apps.clear();
+
+            for (int n = 0; n < accounts.length(); n++) {
+                try {
+                    JSONObject object = accounts.getJSONObject(n);
+                    Integer id = Integer.parseInt(object.getString("accountId"));
+                    String displayName = object.getString("displayName");
+                    String appUrl = object.getString("url");
+                    String platform = object.getString("platform");
+                    String username = object.getString("username");
+                    App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
+                    apps.add(app);
+                } catch (JSONException e) {
                     e.printStackTrace();
-                } finally {
-                    if(urlConnection != null) {
-                        urlConnection.disconnect();
-                    }
                 }
 
-                apps.clear();
-
-                for(int n = 0; n < accounts.length(); n++)
-                {
-                    try {
-                        JSONObject object = accounts.getJSONObject(n);
-                        Integer id = Integer.parseInt(object.getString("accountId"));
-                        String displayName = object.getString("displayName");
-                        String appUrl = object.getString("url");
-                        String platform = object.getString("platform");
-                        String username = object.getString("username");
-                        App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
-                        apps.add(app);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                return null;
+            }
+            return null;
         }
 
         @Override

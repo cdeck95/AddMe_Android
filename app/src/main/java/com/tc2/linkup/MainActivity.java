@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
-       // mViewPager.setAdapter(mSectionsPagerAdapter);
+        // mViewPager.setAdapter(mSectionsPagerAdapter);
         setupViewPager(mViewPager);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         // Initialize the Amazon Cognito credentials provider
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                 getApplicationContext(),
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 Regions.US_EAST_1 // Region
         );
 
-        Log.d(TAG, credentialsProvider.getIdentityId()+"");
+        Log.d(TAG, credentialsProvider.getIdentityId() + "");
         String cognitoId = credentialsProvider.getIdentityId();
         CredentialsManager.getInstance().setCognitoId(cognitoId);
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);

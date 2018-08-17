@@ -1,11 +1,10 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 public class ImportCodeActivity extends Fragment {
 

@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.app.Dialog;
 import android.content.SharedPreferences;
@@ -27,16 +27,30 @@ import org.json.JSONObject;
 
 public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 
+    private static final String TAG = "PersonalCodeBottomSheet";
     SharedPreferences prefs;
     EditText displayName;
     EditText username;
-    private static final String TAG = "PersonalCodeBottomSheet";
     ImageButton shareButton;
     ImageView imageView;
     ImageButton refreshButton;
     JSONObject jsonObject;
     View contentView;
     String accounts;
+    private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
+
+
+        @Override
+        public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                dismiss();
+            }
+        }
+
+        @Override
+        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,21 +87,6 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             j.printStackTrace();
         }
     }
-
-    private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
-
-
-        @Override
-        public void onStateChanged(@NonNull View bottomSheet, int newState) {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismiss();
-            }
-        }
-
-        @Override
-        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-        }
-    };
 
     @Override
     public void setupDialog(Dialog dialog, int style) {

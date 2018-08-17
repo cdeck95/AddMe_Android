@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,16 +10,7 @@ import java.io.Serializable;
  * Created by Tom on 3/24/17.
  */
 
-public class App implements Serializable, Parcelable
-{
-
-    private int appID;
-    private String platform;
-    private String displayName;
-    private String url;
-    private boolean appSwitchIsOn;
-    private String username;
-    private static final String TAG = "APP";
+public class App implements Serializable, Parcelable {
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         public App createFromParcel(Parcel in) {
@@ -30,13 +21,19 @@ public class App implements Serializable, Parcelable
             return new App[size];
         }
     };
+    private static final String TAG = "APP";
+    private int appID;
+    private String platform;
+    private String displayName;
+    private String url;
+    private boolean appSwitchIsOn;
+    private String username;
 
-    public App(){
+    public App() {
 
     }
 
-    public App(int appID, String displayName, String platform, String url, String usernameIn, Boolean appSwitchIsOn)
-    {
+    public App(int appID, String displayName, String platform, String url, String usernameIn, Boolean appSwitchIsOn) {
         this.appID = appID;
         this.displayName = displayName;
         this.platform = platform;
@@ -45,12 +42,28 @@ public class App implements Serializable, Parcelable
         this.appSwitchIsOn = appSwitchIsOn;
     }
 
-    public App(int appID, String displayName, String platform, String url)
-    {
+    public App(int appID, String displayName, String platform, String url) {
         this.appID = appID;
         this.displayName = displayName;
         this.platform = platform;
         this.url = url;
+    }
+
+    public App(Parcel in) {
+        this.appID = in.readInt();
+        this.displayName = in.readString();
+        this.platform = in.readString();
+        this.url = in.readString();
+        this.username = in.readString();
+        Integer bool = in.readInt();
+        if (bool == 1) {
+            setAppSwitchIsOn(true);
+        } else if (bool == 0) {
+            setAppSwitchIsOn(false);
+        } else {
+            setAppSwitchIsOn(false);
+            Log.d(TAG, "boolean was not 1 or 0");
+        }
     }
 
     public int getAppID() {
@@ -101,24 +114,6 @@ public class App implements Serializable, Parcelable
         this.username = username;
     }
 
-
-    public App(Parcel in) {
-        this.appID = in.readInt();
-        this.displayName = in.readString();
-        this.platform = in.readString();
-        this.url = in.readString();
-        this.username = in.readString();
-        Integer bool = in.readInt();
-        if (bool == 1) {
-           setAppSwitchIsOn(true);
-        } else if (bool == 0){
-            setAppSwitchIsOn(false);
-        } else {
-            setAppSwitchIsOn(false);
-            Log.d(TAG, "boolean was not 1 or 0");
-        }
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -131,7 +126,7 @@ public class App implements Serializable, Parcelable
         dest.writeString(this.platform);
         dest.writeString(this.url);
         dest.writeString(this.username);
-        if(isAppSwitchIsOn()) {
+        if (isAppSwitchIsOn()) {
             dest.writeInt(1);
         } else dest.writeInt(0);
     }

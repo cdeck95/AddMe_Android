@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.app.Dialog;
 import android.content.pm.PackageInfo;
@@ -26,14 +26,6 @@ import de.cketti.mailto.EmailIntentBuilder;
 public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment implements ProgressGenerator.OnCompleteListener {
 
     private static final String TAG = "AddAppActivity";
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
 
@@ -50,6 +42,12 @@ public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     };
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
         final View contentView = View.inflate(getContext(), R.layout.help_activity, null);
@@ -62,7 +60,7 @@ public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             e.printStackTrace();
         }
 
-        TextView helpTV = (TextView) contentView.findViewById(R.id.issueDesc);
+        TextView helpTV = contentView.findViewById(R.id.issueDesc);
         NiceSpinner niceSpinner = contentView.findViewById(R.id.helpChoicesSpinner);
         List<String> dataset = new LinkedList<>(Arrays.asList(getResources().getStringArray(R.array.help_choices)));
         niceSpinner.attachDataSource(dataset);
@@ -74,9 +72,9 @@ public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         final ProgressGenerator progressGenerator = new ProgressGenerator(this);
         final ActionProcessButton btnSignIn = contentView.findViewById(R.id.submitBtn);
 
-            btnSignIn.setMode(ActionProcessButton.Mode.ENDLESS);
+        btnSignIn.setMode(ActionProcessButton.Mode.ENDLESS);
 
-          //  btnSignIn.setMode(ActionProcessButton.Mode.PROGRESS);
+        //  btnSignIn.setMode(ActionProcessButton.Mode.PROGRESS);
 
         btnSignIn.setOnClickListener(v -> {
             progressGenerator.start(btnSignIn);
@@ -87,9 +85,9 @@ public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             boolean success = EmailIntentBuilder.from(getActivity())
                     .to("support@tc2pro.com")
                     .subject("" + dataset.get(niceSpinner.getSelectedIndex()))
-                    .body(""+ helpTV.getText().toString())
+                    .body("" + helpTV.getText().toString())
                     .start();
-            if(success){
+            if (success) {
                 btnSignIn.setEnabled(true);
                 helpTV.setEnabled(true);
                 niceSpinner.setEnabled(true);

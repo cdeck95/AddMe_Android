@@ -1,4 +1,4 @@
-package tc2.addme.com.addme;
+package com.tc2.linkup;
 
 import android.os.Handler;
 
@@ -8,13 +8,9 @@ import java.util.Random;
 
 public class ProgressGenerator {
 
-    public interface OnCompleteListener {
-
-        public void onComplete();
-    }
-
     private OnCompleteListener mListener;
     private int mProgress;
+    private Random random = new Random();
 
     public ProgressGenerator(OnCompleteListener listener) {
         mListener = listener;
@@ -36,9 +32,12 @@ public class ProgressGenerator {
         }, generateDelay());
     }
 
-    private Random random = new Random();
-
     private int generateDelay() {
         return random.nextInt(1000);
+    }
+
+    public interface OnCompleteListener {
+
+        void onComplete();
     }
 }

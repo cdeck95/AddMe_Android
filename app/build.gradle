@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "tc2.addme.com.addme"
+        applicationId "com.tc2.linkup"
         minSdkVersion 23
         targetSdkVersion 27
         versionCode 1

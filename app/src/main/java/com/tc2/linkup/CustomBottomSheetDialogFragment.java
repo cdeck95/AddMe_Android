@@ -1,5 +1,4 @@
-package tc2.addme.com.addme;
-
+package com.tc2.linkup;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -38,14 +37,6 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
 
     private static final String TAG = "AddAppActivity";
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
 
@@ -60,6 +51,12 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         public void onSlide(@NonNull View bottomSheet, float slideOffset) {
         }
     };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public void setupDialog(Dialog dialog, int style) {
@@ -173,7 +170,7 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         dialogBuilder.setPositiveButton("Add", (dialog, whichButton) -> {
             String displayName = name.getText().toString().trim();
             String username = email.getText().toString();
-           // String messageStr = message.getText().toString().trim();
+            // String messageStr = message.getText().toString().trim();
             Log.d(TAG, displayName);
             Log.d(TAG, username);
             new Networking(getView(), getActivity(), username, displayName, platformIn).execute();
@@ -188,27 +185,28 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
-    }
+}
 
- class Networking extends AsyncTask<Void, Void, Void> {
-        String title;
-        Context mcontext;
-        View mView;
-        String userName, displayName, platform;
-        App app;
-        ProgressDialog mProgressDialog;
-        private static final String TAG = "Networking_AddApp";
-        HttpURLConnection urlConnection = null;
+class Networking extends AsyncTask<Void, Void, Void> {
+    private static final String TAG = "Networking_AddApp";
+    String title;
+    Context mcontext;
+    View mView;
+    String userName, displayName, platform;
+    App app;
+    ProgressDialog mProgressDialog;
+    HttpURLConnection urlConnection = null;
 
 
-    public Networking(View v, Context c, String userName, String display_name, String platform){
-        mcontext=c;
-        mView=v;
+    public Networking(View v, Context c, String userName, String display_name, String platform) {
+        mcontext = c;
+        mView = v;
         this.userName = userName;
         this.displayName = display_name;
         this.platform = platform;
         app = new App();
     }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -219,101 +217,101 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         mProgressDialog.show();
     }
 
-     @Override
-     protected Void doInBackground(Void... params) {
-         HttpURLConnection httpcon;
-         JSONObject tempObject = new JSONObject();
+    @Override
+    protected Void doInBackground(Void... params) {
+        HttpURLConnection httpcon;
+        JSONObject tempObject = new JSONObject();
 
-         String cognitoId = CredentialsManager.getInstance().getCognitoId();
-         String url = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
+        String cognitoId = CredentialsManager.getInstance().getCognitoId();
+        String url = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
 
-         Log.e(TAG, "Retrieve Data URL: " + url);
-         try {
-             //Connect
-             httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
-             httpcon.setRequestProperty("Content-Type", "application/json");
-             httpcon.setRequestProperty("Accept", "application/json");
-             httpcon.setRequestMethod("POST");
-             httpcon.connect();
+        Log.e(TAG, "Retrieve Data URL: " + url);
+        try {
+            //Connect
+            httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+            httpcon.setRequestProperty("Content-Type", "application/json");
+            httpcon.setRequestProperty("Accept", "application/json");
+            httpcon.setRequestMethod("POST");
+            httpcon.connect();
 
-             //Make JSON
+            //Make JSON
 //             {
 //                  "displayName": "string",
 //                  "platform": "string",
 //                  "url": "string"
 //             }
-             try {
-                 tempObject.put("username", userName);
-                 tempObject.put("displayName", displayName);
-                 tempObject.put("platform", platform);
-                 switch(platform) {
-                     case "Facebook":
-                        tempObject.put("url",  "https://www.facebook.com/" + (userName));
+            try {
+                tempObject.put("username", userName);
+                tempObject.put("displayName", displayName);
+                tempObject.put("platform", platform);
+                switch (platform) {
+                    case "Facebook":
+                        tempObject.put("url", "https://www.facebook.com/" + (userName));
                         break;
-                     case "Twitter":
-                         tempObject.put("url",  "https://www.twitter.com/" + (userName));
-                         break;
-                     case "Instagram":
-                         tempObject.put("url",  "https://www.instagram.com/" + (userName));
-                         break;
-                     case "Snapchat":
-                         tempObject.put("url",  "https://www.snapchat.com/add/" + (userName));
-                         break;
-                     case "LinkedIn":
-                         tempObject.put("url",  "https://www.linkedin.com/in/" + (userName));
-                         break;
-                     case "GooglePlus":
-                         tempObject.put("url",  "https://www.plus.google.com/" + (userName));
-                         break;
-                     case "Xbox":
-                         String usernameURL = URLEncoder.encode(userName, "utf-8");
-                         tempObject.put("url",  "https://account.xbox.com/en-us/Profile?GamerTag=" + (usernameURL));
-                         break;
-                     case "PSN":
-                         usernameURL = URLEncoder.encode(userName, "utf-8");
-                         tempObject.put("url",  "https://my.playstation.com/profile/" + (usernameURL));
-                         break;
-                     case "Twitch":
-                         tempObject.put("url",  "https://m.twitch.tv/" + userName + "/profile");
-                         break;
-                     case "Custom":
-                         tempObject.put("url", userName);
-                         break;
-                     default:
-                         Log.d(TAG, "unknown app found: " + platform);
-                 }
+                    case "Twitter":
+                        tempObject.put("url", "https://www.twitter.com/" + (userName));
+                        break;
+                    case "Instagram":
+                        tempObject.put("url", "https://www.instagram.com/" + (userName));
+                        break;
+                    case "Snapchat":
+                        tempObject.put("url", "https://www.snapchat.com/add/" + (userName));
+                        break;
+                    case "LinkedIn":
+                        tempObject.put("url", "https://www.linkedin.com/in/" + (userName));
+                        break;
+                    case "GooglePlus":
+                        tempObject.put("url", "https://www.plus.google.com/" + (userName));
+                        break;
+                    case "Xbox":
+                        String usernameURL = URLEncoder.encode(userName, "utf-8");
+                        tempObject.put("url", "https://account.xbox.com/en-us/Profile?GamerTag=" + (usernameURL));
+                        break;
+                    case "PSN":
+                        usernameURL = URLEncoder.encode(userName, "utf-8");
+                        tempObject.put("url", "https://my.playstation.com/profile/" + (usernameURL));
+                        break;
+                    case "Twitch":
+                        tempObject.put("url", "https://m.twitch.tv/" + userName + "/profile");
+                        break;
+                    case "Custom":
+                        tempObject.put("url", userName);
+                        break;
+                    default:
+                        Log.d(TAG, "unknown app found: " + platform);
+                }
 
-                 tempObject.put("isSwitchOn", true);
-                 Log.d(TAG, tempObject.toString());
-             } catch (JSONException j) {
-                 j.printStackTrace();
-             }
-
-
-             //Write
-             OutputStream os = httpcon.getOutputStream();
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-             writer.write(tempObject.toString());
-             writer.close();
-             os.close();
-
-             Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
-             Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+                tempObject.put("isSwitchOn", true);
+                Log.d(TAG, tempObject.toString());
+            } catch (JSONException j) {
+                j.printStackTrace();
+            }
 
 
-             if (httpcon.getResponseCode() != 404) {
-                 Log.e(TAG, "doInBackground: " + httpcon.getInputStream());
-             } else {
-             }
+            //Write
+            OutputStream os = httpcon.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.write(tempObject.toString());
+            writer.close();
+            os.close();
+
+            Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+            Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
 
 
-         } catch (UnsupportedEncodingException e) {
-             e.printStackTrace();
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-         return null;
-     }
+            if (httpcon.getResponseCode() != 404) {
+                Log.e(TAG, "doInBackground: " + httpcon.getInputStream());
+            } else {
+            }
+
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     protected void onPostExecute(Void result) {
@@ -326,12 +324,12 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
                 .content("Your account has been added to the database.")
                 .cancelable(true, true)
                 .neutralButton("DISMISS", droidDialog -> {
-            droidDialog.dismiss();
+                    droidDialog.dismiss();
 //            final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
 //            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
 //            snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
 //            snackBar.show();
-        }).show();
+                }).show();
 
     }
 

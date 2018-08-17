@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AddMe</string>
+    <string name="app_name">LinkUp</string>
     <string name="facebook_app_id">365979163888235</string>
     <string name="fb_login_protocol_scheme">fb365979163888235</string>
     <string name="greeting">Hello, </string>

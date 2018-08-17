@@ -2,6 +2,7 @@ package tc2.addme.com.addme;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +18,10 @@ import android.widget.Toast;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 //import android.support.v4.app.Fragment;
 
@@ -46,15 +51,9 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
     }
 
     public void onClick(View v) {
-
-//        llSearch.setVisibility(View.GONE);
-//        IntentIntegrator integrator = new IntentIntegrator(getActivity());
-//        integrator.setPrompt("Scan a barcode or QRcode");
-//        integrator.setOrientationLocked(false);
-//        integrator.initiateScan();
         IntentIntegrator integrator = new IntentIntegrator(getActivity());
         Intent i = integrator.createScanIntent();
-        i.setAction(Intents.Scan.ACTION);
+        i.setAction(Intents.Scan.ONE_D_MODE);
         i.putExtra("RESULT_DISPLAY_DURATION_MS", 0L);
         startActivityForResult(i, IntentIntegrator.REQUEST_CODE);
     }
@@ -68,6 +67,25 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
                 Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 Log.e(TAG, "Finished:" + result.getContents());
+                try {
+                    JSONObject jsonObject = new JSONObject(result.getContents());
+                    JSONArray accounts = jsonObject.getJSONArray("accounts");
+                    //Log.e(TAG, "Account number: " + accounts.length());
+                    if (accounts.length() > 0) {
+                        for (int i = 0; i < accounts.length(); i++) {
+                            JSONObject tempObject = accounts.getJSONObject(i);
+                            //Log.e(TAG, "tempObject: " + tempObject.get("platform"));
+                            if (tempObject.getString("platform").equals("Facebook")) {
+                                Log.e(TAG, "Facebook Link: " + Uri.parse(tempObject.getString("url").toLowerCase()));
+
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tempObject.getString("url").toLowerCase()));
+                                startActivity(browserIntent);
+                            }
+                        }
+                    }
+                } catch (JSONException j) {
+                    j.printStackTrace();
+                }
                 llSearch.setVisibility(View.VISIBLE);
                 tvScanContent.setText(result.getContents());
                 tvScanFormat.setText(result.getFormatName());

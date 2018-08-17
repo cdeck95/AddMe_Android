@@ -1,6 +1,7 @@
 package tc2.addme.com.addme;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -21,9 +22,6 @@ import android.widget.ListView;
 import android.widget.Switch;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +33,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-
 public class ProfileActivity extends Fragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = "ProfileActivity";
@@ -46,12 +43,15 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
     private ImageButton imageButton;
     //ProgressDialog mProgressDialog;
     HttpURLConnection urlConnection = null;
+    SharedPreferences prefs;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.profile_tab, container, false);
+
+        prefs = getContext().getSharedPreferences("MyPref", 0);
 
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
         appList = rootView.findViewById(R.id.appsListView);
@@ -189,10 +189,12 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                             builder.append(line);
                         }
 
-                        Log.d(TAG, "response buffer: " + builder.toString());
+                        Log.e(TAG, "response buffer: " + builder.toString());
 
                         obj = new JSONObject(builder.toString());
                         accounts = obj.getJSONArray("accounts");
+                        prefs.edit().putString("accounts", builder.toString()).apply();
+
                     } else {
                         Log.d(TAG, "No input stream");
                         return null;

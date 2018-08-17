@@ -1,11 +1,10 @@
 package tc2.addme.com.addme;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -18,7 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.google.gson.JsonObject;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -27,11 +25,9 @@ import com.google.zxing.common.BitMatrix;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 
+    SharedPreferences prefs;
     EditText displayName;
     EditText username;
     private static final String TAG = "PersonalCodeBottomSheet";
@@ -40,32 +36,42 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     ImageButton refreshButton;
     JSONObject jsonObject;
     View contentView;
+    String accounts;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         contentView = View.inflate(getContext(), R.layout.personal_code_modal, null);
 
+        prefs = getContext().getSharedPreferences("MyPref", 0);
+        accounts = prefs.getString("accounts", "");
 
-        Bundle data = getArguments();
-        ArrayList<App> apps = data.getParcelableArrayList("apps");
-        HashMap<String, String> map = new HashMap<>();
-        if(apps.size() == 0){
-            Log.d(TAG, "no apps");
-        } else {
-            for(App app: apps) {
-                Log.d(TAG, app.toString());
-                if(app.isAppSwitchIsOn()){
-                    Log.d(TAG, "Will add to QR code...");
-                    map.put(app.getDisplayName(), app.getUrl());
-                }
-            }
+        Log.e(TAG, "accounts: " + accounts);
+
+//        Bundle data = getArguments();
+//        ArrayList<App> apps = data.getParcelableArrayList("apps");
+//        HashMap<String, String> map = new HashMap<>();
+//        if(apps.size() == 0){
+//            Log.d(TAG, "no apps");
+//        } else {
+//            for(App app: apps) {
+//                Log.d(TAG, app.toString());
+//                if(app.isAppSwitchIsOn()){
+//                    Log.d(TAG, "Will add to QR code...");
+//                    map.put(app.getDisplayName(), app.getUrl());
+//                }
+//            }
+//        }
+
+        //jsonObject = new JSONObject(map);
+        try {
+            jsonObject = new JSONObject(accounts);
+            Log.e(TAG, "jsonObject:" + jsonObject.toString());
+            imageView = contentView.findViewById(R.id.qrCode);
+            RefreshQRCode(jsonObject);
+        } catch (JSONException j) {
+            j.printStackTrace();
         }
-
-        jsonObject = new JSONObject(map);
-        Log.d(TAG, jsonObject.toString());
-        imageView = (ImageView) contentView.findViewById(R.id.qrCode);
-        RefreshQRCode(jsonObject);
     }
 
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
@@ -95,7 +101,7 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
         }
 
-        refreshButton = (ImageButton) contentView.findViewById(R.id.refreshButton);
+        refreshButton = contentView.findViewById(R.id.refreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,7 +109,7 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             }
         });
 
-        shareButton = (ImageButton) contentView.findViewById(R.id.shareButton);
+        shareButton = contentView.findViewById(R.id.shareButton);
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

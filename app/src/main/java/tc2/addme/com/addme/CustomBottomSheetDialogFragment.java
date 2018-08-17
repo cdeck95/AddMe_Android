@@ -12,15 +12,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.droidbyme.dialoglib.DroidDialog;
 
@@ -69,15 +66,10 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         super.setupDialog(dialog, style);
         final View contentView = View.inflate(getContext(), R.layout.dialog_modal, null);
         dialog.setContentView(contentView);
-        TextView facebook = contentView.findViewById(R.id.Facebook);
-        facebook.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_facebook), null, null);
-        TextView twitter = contentView.findViewById(R.id.Twitter);
-        twitter.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_twitter), null, null);
-        TextView instagram = contentView.findViewById(R.id.Instagram);
-        instagram.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_instagram), null, null);
-        instagram.setGravity(Gravity.BOTTOM);
-        TextView snapchat = contentView.findViewById(R.id.Snapchat);
-        snapchat.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(getContext(), R.mipmap.ic_snapchat), null, null);
+        ImageView facebook = contentView.findViewById(R.id.Facebook);
+        ImageView twitter = contentView.findViewById(R.id.Twitter);
+        ImageView instagram = contentView.findViewById(R.id.Instagram);
+        ImageView snapchat = contentView.findViewById(R.id.Snapchat);
         ImageView xbox = contentView.findViewById(R.id.xbox);
         ImageView psn = contentView.findViewById(R.id.psn);
         ImageView twitch = contentView.findViewById(R.id.twitch);
@@ -172,8 +164,8 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         final View dialogView = inflater.inflate(R.layout.custom_dialog, null);
         dialogBuilder.setView(dialogView);
 
-        final EditText name = (EditText) dialogView.findViewById(R.id.displayName);
-        final EditText email = (EditText) dialogView.findViewById(R.id.username);
+        final EditText name = dialogView.findViewById(R.id.displayName);
+        final EditText email = dialogView.findViewById(R.id.username);
         //final EditText message = (EditText) dialogView.findViewById(R.id.customFeedback);
 
         dialogBuilder.setTitle("Add Account");

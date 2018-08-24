@@ -1,17 +1,24 @@
 package com.tc2.linkup;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -20,7 +27,6 @@ import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.regions.Regions;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -53,6 +59,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow(); // in Activity's onCreate() for instance
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+
+        GradientDrawable gradientDrawable = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{ContextCompat.getColor(this, R.color.GColor1),
+                        ContextCompat.getColor(this, R.color.GColor2),
+                        ContextCompat.getColor(this, R.color.GColor3),
+                        ContextCompat.getColor(this, R.color.GColor4),
+                        ContextCompat.getColor(this, R.color.GColor5)});
+
+        findViewById(R.id.background).setBackground(gradientDrawable);
+
+        Permissions();
 
         addAppButton = findViewById(R.id.fab);
 
@@ -64,10 +90,10 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
         // mViewPager.setAdapter(mSectionsPagerAdapter);
-        setupViewPager(mViewPager);
+//        setupViewPager(mViewPager);
 
-        TabLayout tabLayout = findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        //TabLayout tabLayout = findViewById(R.id.tabs);
+        //tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -102,9 +128,9 @@ public class MainActivity extends AppCompatActivity {
             //Picasso.with(getApplicationContext()).load(personPhoto).into(imageView);
         }
 
-        mPublisherAdView = findViewById(R.id.publisherAdView);
-        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().addTestDevice("B3EEABB8EE11C2BE770B684D95219ECB").build();
-        mPublisherAdView.loadAd(adRequest);
+//        mPublisherAdView = findViewById(R.id.publisherAdView);
+//        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().addTestDevice("B3EEABB8EE11C2BE770B684D95219ECB").build();
+//        mPublisherAdView.loadAd(adRequest);
 
         Button customButton = new Button(this);
         customButton.setText("");
@@ -226,13 +252,37 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private void setupViewPager(ViewPager viewPager) {
-        SectionPageAdapter adapter = new SectionPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new ProfileActivity(), "Profile");
-        adapter.addFragment(new ScanCodeActivity(), "Scan Code");
-        adapter.addFragment(new ImportCodeActivity(), "Import Code");
-        viewPager.setAdapter(adapter);
+//    private void setupViewPager(ViewPager viewPager) {
+//        SectionPageAdapter adapter = new SectionPageAdapter(getSupportFragmentManager());
+//        adapter.addFragment(new ProfileActivity(), "Profile");
+//        adapter.addFragment(new ScanCodeActivity(), "Scan Code");
+//        adapter.addFragment(new ImportCodeActivity(), "Import Code");
+//        viewPager.setAdapter(adapter);
+//    }
+
+    private void Permissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.CAMERA)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        0);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        0);
+            }
+        }
     }
-
-
 }

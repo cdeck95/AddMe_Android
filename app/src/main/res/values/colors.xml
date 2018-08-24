@@ -16,6 +16,12 @@
     <color name="colorAccent2">#AED9DA</color>
     <color name="colorAccent3">#EDFAFD</color>
 
+    <color name="GColor1">#EDFAFD</color>
+    <color name="GColor2">#AED9DA</color>
+    <color name="GColor3">#3DDAD7</color>
+    <color name="GColor4">#2A93D5</color>
+    <color name="GColor5">#135589</color>
+
 
     <!--<color name="colorPrimary">#57BC90</color>-->
     <!--<color name="colorPrimaryDark">#A5A5AF</color>-->

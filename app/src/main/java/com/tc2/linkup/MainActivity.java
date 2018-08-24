@@ -25,8 +25,6 @@ import android.widget.ImageButton;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.regions.Regions;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -63,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
             Window w = getWindow(); // in Activity's onCreate() for instance
             w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            View decorView = getWindow().getDecorView();
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            decorView.setSystemUiVisibility(uiOptions);
         }
 
         GradientDrawable gradientDrawable = new GradientDrawable(
@@ -137,16 +132,16 @@ public class MainActivity extends AppCompatActivity {
         customButton.setEnabled(false);
         customButton.setVisibility(View.GONE);
 
-        ViewTarget target = new ViewTarget(R.id.fab, this);
-        new ShowcaseView.Builder(this)
-                .setTarget(target)
-                .setContentTitle("Let's get started!")
-                .setContentText("Click the plus button to add an account!")
-                .hideOnTouchOutside()
-                .setStyle(R.style.CustomShowcaseTheme2)
-                .replaceEndButton(customButton)
-
-                .build();
+//        ViewTarget target = new ViewTarget(R.id.fab, this);
+//        new ShowcaseView.Builder(this)
+//                .setTarget(target)
+//                .setContentTitle("Let's get started!")
+//                .setContentText("Click the plus button to add an account!")
+//                .hideOnTouchOutside()
+//                .setStyle(R.style.CustomShowcaseTheme2)
+//                .replaceEndButton(customButton)
+//
+//                .build();
 
 
     }

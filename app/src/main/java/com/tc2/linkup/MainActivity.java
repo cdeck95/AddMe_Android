@@ -29,6 +29,7 @@ import com.amazonaws.regions.Regions;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -59,11 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
         GradientDrawable gradientDrawable = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{ContextCompat.getColor(this, R.color.GColor1),
-                        ContextCompat.getColor(this, R.color.GColor2),
-                        ContextCompat.getColor(this, R.color.GColor3),
-                        ContextCompat.getColor(this, R.color.GColor4),
-                        ContextCompat.getColor(this, R.color.GColor5)});
+                new int[]{ContextCompat.getColor(this, R.color.GColor2),
+                        ContextCompat.getColor(this, R.color.GColor2)});
 
         findViewById(R.id.background).setBackground(gradientDrawable);
 
@@ -124,18 +122,10 @@ public class MainActivity extends AppCompatActivity {
         customButton.setEnabled(false);
         customButton.setVisibility(View.GONE);
 
-//        ViewTarget target = new ViewTarget(R.id.fab, this);
-//        new ShowcaseView.Builder(this)
-//                .setTarget(target)
-//                .setContentTitle("Let's get started!")
-//                .setContentText("Click the plus button to add an account!")
-//                .hideOnTouchOutside()
-//                .setStyle(R.style.CustomShowcaseTheme2)
-//                .replaceEndButton(customButton)
-//
-//                .build();
-
-
+        BottomNavigationViewEx bnve = findViewById(R.id.navigation);
+        bnve.enableAnimation(false);
+        bnve.enableShiftingMode(false);
+        bnve.enableItemShiftingMode(true);
     }
 
     @Override

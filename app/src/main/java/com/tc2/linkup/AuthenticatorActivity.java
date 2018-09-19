@@ -2,7 +2,6 @@ package com.tc2.linkup;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -15,7 +14,6 @@ import com.amazonaws.mobile.auth.ui.SignInUI;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
-import com.appus.splash.Splash;
 
 public class AuthenticatorActivity extends AppCompatActivity {
 
@@ -25,13 +23,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator);
-
-        Splash.Builder splash = new Splash.Builder(this, getSupportActionBar());
-        splash.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        // splash.setBackgroundImage(ContextCompat.getDrawable(this, R.drawable.splash));
-        //splash.setSplashImage(ContextCompat.getDrawable(this, R.mipmap.ic_launcher_horizontal));
-        splash.perform();
-
 
         AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
             @Override

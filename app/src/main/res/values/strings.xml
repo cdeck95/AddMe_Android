@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AddMe</string>
+    <string name="app_name">LinkUp</string>
     <string name="facebook_app_id">365979163888235</string>
     <string name="fb_login_protocol_scheme">fb365979163888235</string>
     <string name="greeting">Hello, </string>
@@ -13,5 +13,30 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="default_app_id">-1</string>
     <string name="default_app_display_name">\"Error Loading App\"</string>
-    <string name="default_app_platform">Unkown</string>
+    <string name="default_app_platform">Unknown</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_sign_in">Sign-in</string>
+    <string name="sign_in_succeeded_message_format">"Sign-in with %s succeeded."</string>
+    <string name="sign_in_canceled_message_format">"Sign-in with %s canceled."</string>
+    <string name="sign_in_or">or sign in with</string>
+    <string name="sign_in_with">Sign in with</string>
+    <string name="sign_in_username">Username</string>
+
+
+    <string name="display_name">Custom Display Name:</string>
+    <string name="username">Username:</string>
+    <string name="custom_feedback">your message:</string>
+
+    <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</string>
+
+
+    <string name="sign_in_message">"You successfully signed-in as %s."</string>
+
+    <string-array name="help_choices">
+        <item>"Can't connect accounts"</item>
+        <item>"Can't create QR code"</item>
+        <item>"QR code is wrong"</item>
+        <item>"Can't scan/import QR Code"</item>
+        <item>"Can't edit/delete apps"</item>
+    </string-array>
 </resources>

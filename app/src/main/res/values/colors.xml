@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#57BC90</color>
-    <color name="colorPrimaryDark">#015249</color>
-    <color name="colorAccent">#77C9D4</color>
-    <color name="colorAccent2">#015249</color>
-    <!--
-     <color name="colorPrimary">#77C9D4</color>
-    <color name="colorPrimaryDark">#57BC90</color>
-    <color name="colorAccent">#015249</color>
-    <color name="colorAccent2">#A5A5AF</color>
+    <!--<color name="colorPrimary">#99D3DF</color>-->
+    <!--<color name="colorPrimaryDark">#88BBD6</color>-->
+    <!--<color name="colorAccent">#CDCDCD</color>-->
+    <!--<color name="colorAccent2">#E9E9E9</color>-->
+    <!---->
+     <!--<color name="colorPrimary">#E9E9E9</color>-->
+    <!--<color name="colorPrimaryDark">#CDCDCD</color>-->
+    <!--<color name="colorAccent">#99D3DF</color>-->
+    <!--<color name="colorAccent2">#88BBD6</color>-->
+
+    <color name="colorPrimary">#2A93D5</color>
+    <color name="colorPrimaryDark">#135589</color>
+    <color name="colorAccent">#3DDAD7</color>
+    <color name="colorAccent2">#AED9DA</color>
+    <color name="colorAccent3">#EDFAFD</color>
+
+    <color name="GColor1">#EDFAFD</color>
+    <color name="GColor2">#AED9DA</color>
+    <color name="GColor3">#3DDAD7</color>
+    <color name="GColor4">#2A93D5</color>
+    <color name="GColor5">#135589</color>
 
 
-    <color name="colorPrimary">#57BC90</color>
-    <color name="colorPrimaryDark">#A5A5AF</color>
-    <color name="colorAccent">#015249</color>
-    <color name="colorAccent2">#A5A5AF</color>
+    <!--<color name="colorPrimary">#57BC90</color>-->
+    <!--<color name="colorPrimaryDark">#A5A5AF</color>-->
+    <!--<color name="colorAccent">#015249</color>-->
+    <!--<color name="colorAccent2">#A5A5AF</color>-->
 
-    <color name="colorPrimary">#A5A5AF</color>
-    <color name="colorPrimaryDark">#015249</color>
-    <color name="colorAccent">#57BC90</color>
-    <color name="colorAccent2">#A5A5AF</color>
-     -->
-    <color name="white">#ffffff</color>
+    <!--<color name="colorPrimary">#A5A5AF</color>-->
+    <!--<color name="colorPrimaryDark">#015249</color>-->
+    <!--<color name="colorAccent">#57BC90</color>-->
+    <!--<color name="colorAccent2">#A5A5AF</color>-->
+
+    <!--<color name="white">#ffffff</color>-->
 </resources>

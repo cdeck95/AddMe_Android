@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,31 +54,11 @@ public class ScreenSlidePageFragment extends Fragment {
         return rootView;
     }
 
-    private class DownloadImageWithURLTask extends AsyncTask<String,Void,Bitmap>{
-        ImageView proflieImage;
-        public DownloadImageWithURLTask(ImageView profileImageIn){
-          this.proflieImage = profileImageIn;
-        }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        new ScreenSlidePageFragment.GetProfiles(getContext()).execute();
 
-        @Override
-        protected Bitmap doInBackground(String... urls) {
-            String pathToFile = urls[0];
-            Bitmap bitmap = null;
-            try {
-                InputStream in = new java.net.URL(pathToFile).openStream();
-                bitmap = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
-                e.printStackTrace();
-            }
-
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result){
-            proflieImage.setImageBitmap(result);
-        }
     }
 
     private class GetProfiles extends AsyncTask<Void, Void, Void> {
@@ -161,16 +142,26 @@ public class ScreenSlidePageFragment extends Fragment {
 
             for (int n = 0; n < profiles.length(); n++) {
                 try {
-                    JSONObject object = profiles.getJSONObject(n);
-                    Integer id = Integer.parseInt(object.getString("profileId"));
-                    String displayName = object.getString("name");
-                    String imageUrl = object.getString("imageUrl");
-                    String description = object.getString("description");
-                    JSONArray accounts = object.getJSONArray("accounts");
-                    //TODO: change app to profile
-                    //App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
+                    Profile profile = new Gson().fromJson(profiles.getString(n), Profile.class);
+//                    JSONObject object = profiles.getJSONObject(n);
+//                    Integer id = Integer.parseInt(object.getString("profileId"));
+//                    String profileName = object.getString("name");
+//                    String imageUrl = object.getString("imageUrl");
+//                    String description = object.getString("description");
+//                    JSONArray jsonAccounts = object.getJSONArray("accounts");
+//                    ArrayList<App> accounts = null;
+//                    for (int i = 0; i < jsonAccounts.length(); ++i) {
+//                        JSONObject account = jsonAccounts.getJSONObject(i);
+//                        ObjectMapper m = new ObjectMapper();
+//                        MyClass myClass = m.readValue(o.toString(), MyClass.class);
+//                        accounts.add(account);
+//                        //....
+//                    }
+//                    //TODO: change app to profile
+//                    Profile profile = new Profile(id, profileName, description, imageUrl, accounts);
+                    Log.d(TAG, profile.toString());
                     //TODO: uncomment and add profile
-                    //profiles.add(app);
+                    profilesArray.add(profile);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -189,6 +180,35 @@ public class ScreenSlidePageFragment extends Fragment {
 
         }
     }
+
+    private class DownloadImageWithURLTask extends AsyncTask<String,Void,Bitmap>{
+        ImageView proflieImage;
+        public DownloadImageWithURLTask(ImageView profileImageIn){
+          this.proflieImage = profileImageIn;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... urls) {
+            String pathToFile = urls[0];
+            Bitmap bitmap = null;
+            try {
+                InputStream in = new java.net.URL(pathToFile).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result){
+            proflieImage.setImageBitmap(result);
+        }
+    }
+
+
 
 }
 

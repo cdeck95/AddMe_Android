@@ -126,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         bnve.enableAnimation(false);
         bnve.enableShiftingMode(false);
         bnve.enableItemShiftingMode(true);
+
+
     }
 
     @Override

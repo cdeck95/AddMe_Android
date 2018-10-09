@@ -2,10 +2,8 @@ package com.tc2.linkup;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Profile implements Serializable, Parcelable {
@@ -21,29 +19,29 @@ public class Profile implements Serializable, Parcelable {
     };
     private static final String TAG = "APP";
     private int profileId;
-    private String profileDescription;
-    private String profileName;
-    private String profileImageUrl;
+    private String description;
+    private String name;
+    private String imageUrl;
     private ArrayList<App> accounts;
 
     public Profile() {
 
     }
 
-    public Profile(int profileId, String profileName, String profileDescription, String profileImageUrl, ArrayList<App> accounts) {
+    public Profile(int profileId, String name, String profileDescription, String imageUrl, ArrayList<App> accounts) {
         this.profileId = profileId;
-        this.profileName = profileName;
-        this.profileDescription = profileDescription;
-        this.profileImageUrl = profileImageUrl;
+        this.name = name;
+        this.description = profileDescription;
+        this.imageUrl = imageUrl;
         this.accounts = accounts;
     }
 
 
     public Profile(Parcel in) {
         this.profileId = in.readInt();
-        this.profileName = in.readString();
-        this.profileDescription = in.readString();
-        this.profileImageUrl = in.readString();
+        this.name = in.readString();
+        this.description = in.readString();
+        this.imageUrl = in.readString();
         in.readTypedList(accounts, App.CREATOR);
     }
 
@@ -55,28 +53,28 @@ public class Profile implements Serializable, Parcelable {
         this.profileId = profileId;
     }
 
-    public String getProfileDescription() {
-        return profileDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setProfileDescription(String profileDescription) {
-        this.profileDescription = profileDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getProfileName() {
-        return profileName;
+    public String getName() {
+        return name;
     }
 
-    public void setProfileName(String profileName) {
-        this.profileName = profileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
 
@@ -96,9 +94,9 @@ public class Profile implements Serializable, Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.profileId);
-        dest.writeString(this.profileName);
-        dest.writeString(this.profileDescription);
-        dest.writeString(this.profileImageUrl);
+        dest.writeString(this.name);
+        dest.writeString(this.description);
+        dest.writeString(this.imageUrl);
         dest.writeTypedList(this.accounts);
     }
 
@@ -106,9 +104,9 @@ public class Profile implements Serializable, Parcelable {
     public String toString() {
         return "Profile: {" +
                 "id='" + profileId + '\'' +
-                ", name='" + profileName + '\'' +
-                ", description='" + profileDescription + '\'' +
-                ", url='" + profileImageUrl + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", accounts='" + accounts + '\'' +
                 '}';
     }

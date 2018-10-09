@@ -134,12 +134,12 @@ public class App implements Serializable, Parcelable {
 
     @Override
     public String toString() {
-        return "App{" +
-                "id='" + accountId + '\'' +
-                ", display name='" + displayName + '\'' +
-                ", username='" + username + '\'' +
-                ", url='" + url + '\'' +
-                ", platform='" + platform + '\'' +
+        return "{" +
+                "\"id\":\"" + accountId + '\"' +
+                ", \"displayName\":\"" + displayName + '\"' +
+                ", \"username\":\"" + username + '\"' +
+                ", \"url\":\"" + url + '\'' +
+                ", \"platform\":\"" + platform + '\"' +
                 //", switch is on='" + appSwitchIsOn + '\'' +
                 '}';
     }

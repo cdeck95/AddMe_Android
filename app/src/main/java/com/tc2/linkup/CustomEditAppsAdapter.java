@@ -41,7 +41,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         });
 
         TextView txtAppID = customView.findViewById(R.id.txtAppID2);
-        String appID = singleApp.getAppID() + "";
+        String appID = singleApp.getAccountId() + "";
         txtAppID.setText(appID);
 
         ImageView appImage = customView.findViewById(R.id.imageView2);

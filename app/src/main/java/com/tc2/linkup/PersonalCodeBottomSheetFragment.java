@@ -72,7 +72,7 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 //                Log.d(TAG, app.toString());
 //                if(app.isAppSwitchIsOn()){
 //                    Log.d(TAG, "Will add to QR code...");
-//                    map.put(app.getDisplayName(), app.getUrl());
+//                    map.put(app.getDisplayName(), app.getImageUrl());
 //                }
 //            }
 //        }

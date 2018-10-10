@@ -37,19 +37,20 @@ public class CustomAppsAdapter extends ArrayAdapter<App> {
         txtAppDisplayName.setText(singleApp.getDisplayName());
 
         Switch txtAppSwitch = customView.findViewById(R.id.appSwitch);
-        txtAppSwitch.setChecked(singleApp.isAppSwitchIsOn());
+        txtAppSwitch.setChecked(true);
+        //txtAppSwitch.setChecked(singleApp.isAppSwitchIsOn());
         txtAppSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.d(TAG, "Checked:" + isChecked);
-                singleApp.setAppSwitchIsOn(isChecked);
-                Log.d(TAG, "Switch is on: " + singleApp.isAppSwitchIsOn());
+                //singleApp.setAppSwitchIsOn(isChecked);
+                //Log.d(TAG, "Switch is on: " + singleApp.isAppSwitchIsOn());
             }
         });
 
 
         TextView txtAppID = customView.findViewById(R.id.txtAppID);
-        String appID = singleApp.getAppID() + "";
+        String appID = singleApp.getAccountId() + "";
         txtAppID.setText(appID);
 
         ImageView appImage = customView.findViewById(R.id.imageView);

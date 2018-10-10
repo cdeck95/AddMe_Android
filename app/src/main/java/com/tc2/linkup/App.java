@@ -22,56 +22,57 @@ public class App implements Serializable, Parcelable {
         }
     };
     private static final String TAG = "APP";
-    private int appID;
+    private int accountId;
     private String platform;
     private String displayName;
     private String url;
-    private boolean appSwitchIsOn;
+    //private boolean appSwitchIsOn;
+    private String userId;
     private String username;
 
     public App() {
 
     }
 
-    public App(int appID, String displayName, String platform, String url, String usernameIn, Boolean appSwitchIsOn) {
-        this.appID = appID;
+    public App(int accountId, String displayName, String platform, String url, String usernameIn, Boolean appSwitchIsOn) {
+        this.accountId = accountId;
         this.displayName = displayName;
         this.platform = platform;
         this.url = url;
         this.username = usernameIn;
-        this.appSwitchIsOn = appSwitchIsOn;
+       // this.appSwitchIsOn = appSwitchIsOn;
     }
 
-    public App(int appID, String displayName, String platform, String url) {
-        this.appID = appID;
+    public App(int accountId, String displayName, String platform, String url) {
+        this.accountId = accountId;
         this.displayName = displayName;
         this.platform = platform;
         this.url = url;
     }
 
     public App(Parcel in) {
-        this.appID = in.readInt();
+        this.accountId = in.readInt();
         this.displayName = in.readString();
         this.platform = in.readString();
         this.url = in.readString();
         this.username = in.readString();
         Integer bool = in.readInt();
-        if (bool == 1) {
-            setAppSwitchIsOn(true);
-        } else if (bool == 0) {
-            setAppSwitchIsOn(false);
-        } else {
-            setAppSwitchIsOn(false);
-            Log.d(TAG, "boolean was not 1 or 0");
-        }
+//        if (bool == 1) {
+//            setAppSwitchIsOn(true);
+//        } else if (bool == 0) {
+//            setAppSwitchIsOn(false);
+//        } else {
+//            setAppSwitchIsOn(false);
+//            Log.d(TAG, "boolean was not 1 or 0");
+//        }
     }
 
-    public int getAppID() {
-        return appID;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public void setAppID(int appID) {
-        this.appID = appID;
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
 
     public String getPlatform() {
@@ -98,13 +99,13 @@ public class App implements Serializable, Parcelable {
         this.url = url;
     }
 
-    public boolean isAppSwitchIsOn() {
-        return appSwitchIsOn;
-    }
-
-    public void setAppSwitchIsOn(boolean appSwitchIsOn) {
-        this.appSwitchIsOn = appSwitchIsOn;
-    }
+//    public boolean isAppSwitchIsOn() {
+//        return appSwitchIsOn;
+//    }
+//
+//    public void setAppSwitchIsOn(boolean appSwitchIsOn) {
+//        this.appSwitchIsOn = appSwitchIsOn;
+//    }
 
     public String getUsername() {
         return username;
@@ -121,25 +122,25 @@ public class App implements Serializable, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.appID);
+        dest.writeInt(this.accountId);
         dest.writeString(this.displayName);
         dest.writeString(this.platform);
         dest.writeString(this.url);
         dest.writeString(this.username);
-        if (isAppSwitchIsOn()) {
-            dest.writeInt(1);
-        } else dest.writeInt(0);
+//        if (isAppSwitchIsOn()) {
+//            dest.writeInt(1);
+//        } else dest.writeInt(0);
     }
 
     @Override
     public String toString() {
-        return "App{" +
-                "id='" + appID + '\'' +
-                ", display name='" + displayName + '\'' +
-                ", username='" + username + '\'' +
-                ", url='" + url + '\'' +
-                ", platform='" + platform + '\'' +
-                ", switch is on='" + appSwitchIsOn + '\'' +
+        return "{" +
+                "\"id\":\"" + accountId + '\"' +
+                ", \"displayName\":\"" + displayName + '\"' +
+                ", \"username\":\"" + username + '\"' +
+                ", \"url\":\"" + url + '\'' +
+                ", \"platform\":\"" + platform + '\"' +
+                //", switch is on='" + appSwitchIsOn + '\'' +
                 '}';
     }
 }

@@ -3,7 +3,9 @@ package com.tc2.linkup;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,13 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.InputStream;
 
 public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 
@@ -34,9 +30,10 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     ImageButton shareButton;
     ImageView imageView;
     ImageButton refreshButton;
-    JSONObject jsonObject;
     View contentView;
-    String accounts;
+    String cognitoId;
+    Integer profileId;
+
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
 
@@ -56,36 +53,6 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         contentView = View.inflate(getContext(), R.layout.personal_code_modal, null);
-
-        prefs = getContext().getSharedPreferences("MyPref", 0);
-        accounts = prefs.getString("accounts", "");
-
-        Log.e(TAG, "accounts: " + accounts);
-
-//        Bundle data = getArguments();
-//        ArrayList<App> apps = data.getParcelableArrayList("apps");
-//        HashMap<String, String> map = new HashMap<>();
-//        if(apps.size() == 0){
-//            Log.d(TAG, "no apps");
-//        } else {
-//            for(App app: apps) {
-//                Log.d(TAG, app.toString());
-//                if(app.isAppSwitchIsOn()){
-//                    Log.d(TAG, "Will add to QR code...");
-//                    map.put(app.getDisplayName(), app.getUrl());
-//                }
-//            }
-//        }
-
-        //jsonObject = new JSONObject(map);
-        try {
-            jsonObject = new JSONObject(accounts);
-            Log.e(TAG, "jsonObject:" + jsonObject.toString());
-            imageView = contentView.findViewById(R.id.qrCode);
-            RefreshQRCode(jsonObject);
-        } catch (JSONException j) {
-            j.printStackTrace();
-        }
     }
 
     @Override
@@ -100,18 +67,25 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
         }
 
+        Bundle args = getArguments();
+        profileId = args.getInt("profileId", -1);
+        cognitoId = CredentialsManager.getInstance().getCognitoId();
+        imageView =  contentView.findViewById(R.id.qrCode);
+
+        if (imageView != null) {
+            new DownloadImageWithURLTask(imageView).execute( "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profileId + "/qr");
+        }
+
         refreshButton = contentView.findViewById(R.id.refreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RefreshQRCode(jsonObject);
+                Log.e(TAG, "Refreshing...");
             }
         });
 
         shareButton = contentView.findViewById(R.id.shareButton);
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        shareButton.setOnClickListener(v -> {
 //                Bitmap icon = mBitmap;
 //                Intent share = new Intent(Intent.ACTION_SEND);
 //                share.setType("image/jpeg");
@@ -127,17 +101,10 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 //                }
 //                share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/temporary_file.jpg"));
 //                startActivity(Intent.createChooser(share, "Share Image"));
-            }
         });
 
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -154,70 +121,30 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    void RefreshQRCode(JSONObject jsonObject) {
-        try {
-            String tempString = jsonObject.toString();
-            Log.d(TAG, "QR code as string: \n" + tempString);
+    private class DownloadImageWithURLTask extends AsyncTask<String,Void,Bitmap> {
+        ImageView profileImage;
+        public DownloadImageWithURLTask(ImageView profileImageIn){
+            this.profileImage = profileImageIn;
+        }
 
-            Bitmap bm = TextToImageEncode(tempString);
-
-            if (bm != null) {
-                Log.d(TAG, "Setting qr code...");
-                imageView.setImageBitmap(bm);
+        @Override
+        protected Bitmap doInBackground(String... urls) {
+            String pathToFile = urls[0];
+            Bitmap bitmap = null;
+            try {
+                InputStream in = new java.net.URL(pathToFile).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
             }
-        } catch (WriterException e) { //eek }
-        }
-    }
 
-    Bitmap TextToImageEncode(String value) throws WriterException {
-        BitMatrix bitMatrix;
-        try {
-            bitMatrix = new MultiFormatWriter().encode(
-                    value,
-                    BarcodeFormat.QR_CODE,
-                    500, 500, null
-            );
-
-        } catch (IllegalArgumentException Illegalargumentexception) {
-
-            return null;
-        }
-        int bitMatrixWidth = bitMatrix.getWidth();
-
-        int bitMatrixHeight = bitMatrix.getHeight();
-
-        int[] pixels = new int[bitMatrixWidth * bitMatrixHeight];
-
-        for (int y = 0; y < bitMatrixHeight; y++) {
-            int offset = y * bitMatrixWidth;
-
-            for (int x = 0; x < bitMatrixWidth; x++) {
-
-                pixels[offset + x] = bitMatrix.get(x, y) ?
-                        Color.BLACK : Color.WHITE;
-            }
-        }
-        Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);
-
-        bitmap.setPixels(pixels, 0, 500, 0, 0, bitMatrixWidth, bitMatrixHeight);
-        return bitmap;
-    }
-
-    public JSONObject createJSON() {
-        JSONObject tempObject;
-
-        tempObject = new JSONObject();
-        try {
-            tempObject.put("Facebook", "http://facebook.com/chris.deck.75");
-            tempObject.put("Insta", "http://www.instagram.com/chris_deck");
-            tempObject.put("Twitter", "http://www.twitter.com/chrisdeck7");
-            tempObject.put("Xbox", "https://account.xbox.com/en-us/Profile?GamerTag=HitTheDeck95");
-            tempObject.put("Twitch", "https://m.twitch.tv/deckchris95/profile");
-        } catch (JSONException j) {
-            Log.e(TAG, "JSON Exception: " + j);
+            return bitmap;
         }
 
-
-        return tempObject;
+        @Override
+        protected void onPostExecute(Bitmap result){
+            profileImage.setImageBitmap(result);
+        }
     }
 }

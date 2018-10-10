@@ -16,6 +16,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        google()
         maven {
             url 'https://maven.google.com'
         }
@@ -23,8 +24,6 @@ allprojects {
         maven {
             url 'https://dl.bintray.com/roman-voronoy/maven/'
         }
-
-        google()
     }
 }
 

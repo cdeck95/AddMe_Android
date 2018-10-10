@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -74,16 +75,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 5;
     private SectionPageAdapter mSectionsPagerAdapter;
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
+    public ViewPager mPager;
+    public PagerAdapter mPagerAdapter;
 
     private ArrayList<Profile> profilesArray = new ArrayList<>();
     HttpURLConnection urlConnection = null;
     private FloatingActionButton addAppButton;
     private Integer selected = -1;
+    private String cognitoId;
 
     String defaultImageURL = "https://images.pexels.com/photos/708440/pexels-photo-708440.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
     private ArrayList<App> apps = new ArrayList<>();
+    SwipeRefreshLayout pullToRefresh;
     // private JSONArray apps = new JSONArray();
 
     @Override
@@ -167,11 +170,36 @@ public class MainActivity extends AppCompatActivity {
 //        mPublisherAdView = findViewById(R.id.publisherAdView);
 //        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().addTestDevice("B3EEABB8EE11C2BE770B684D95219ECB").build();
 //        mPublisherAdView.loadAd(adRequest);
-
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setVisibility(View.GONE);
+
+        pullToRefresh = findViewById(R.id.pullToRefresh);
+        //setting an setOnRefreshListener on the SwipeDownLayout
+        pullToRefresh.setOnRefreshListener(() -> {
+            Log.e(TAG, "Refeshing...");
+            pullToRefresh.setRefreshing(true);
+            new GetProfiles(MainActivity.this).execute();
+            mPagerAdapter.notifyDataSetChanged();
+            pullToRefresh.setRefreshing(false);
+        });
+
+        mPager.addOnPageChangeListener( new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled( int position, float v, int i1 ) {
+            }
+
+            @Override
+            public void onPageSelected( int position ) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged( int state ) {
+                enableDisableSwipeRefresh( state == ViewPager.SCROLL_STATE_IDLE );
+            }
+        } );
+
 
         Button customButton = new Button(this);
         customButton.setText("");
@@ -184,6 +212,12 @@ public class MainActivity extends AppCompatActivity {
         bnve.enableItemShiftingMode(true);
 
 
+    }
+
+    private void enableDisableSwipeRefresh(boolean enable) {
+        if (pullToRefresh != null) {
+            pullToRefresh.setEnabled(enable);
+        }
     }
 
     private void addProfile() {
@@ -230,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         Log.d(TAG, credentialsProvider.getIdentityId() + "");
-        String cognitoId = credentialsProvider.getIdentityId();
+        cognitoId = credentialsProvider.getIdentityId();
         CredentialsManager.getInstance().setCognitoId(cognitoId);
     }
 
@@ -316,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class GetProfiles extends AsyncTask<Void, Void, Void> {
+    public class GetProfiles extends AsyncTask<Void, Void, Void> {
         String title;
         Context mcontext;
         MaterialDialog dialog;
@@ -350,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
             //connect to API
             JSONObject obj = null;
             JSONArray profiles = new JSONArray();
-            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            cognitoId = CredentialsManager.getInstance().getCognitoId();
             if(cognitoId == null){
                 setCognitoId();
                 cognitoId = CredentialsManager.getInstance().getCognitoId();
@@ -406,24 +440,7 @@ public class MainActivity extends AppCompatActivity {
                     String profileString = profiles.getString(n);
                     Log.d(TAG, profileString);
                     Profile profile = new Gson().fromJson(profileString, Profile.class);
-//                    JSONObject object = profiles.getJSONObject(n);
-//                    Integer id = Integer.parseInt(object.getString("profileId"));
-//                    String profileName = object.getString("name");
-//                    String imageUrl = object.getString("imageUrl");
-//                    String description = object.getString("description");
-//                    JSONArray jsonAccounts = object.getJSONArray("accounts");
-//                    ArrayList<App> accounts = null;
-//                    for (int i = 0; i < jsonAccounts.length(); ++i) {
-//                        JSONObject account = jsonAccounts.getJSONObject(i);
-//                        ObjectMapper m = new ObjectMapper();
-//                        MyClass myClass = m.readValue(o.toString(), MyClass.class);
-//                        accounts.add(account);
-//                        //....
-//                    }
-//                    //TODO: change app to profile
-//                    Profile profile = new Profile(id, profileName, description, imageUrl, accounts);
                     Log.d(TAG, profile.toString());
-                    //TODO: uncomment and add profile
                     profilesArray.add(profile);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -485,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
             JSONObject obj = new JSONObject();
             JSONObject tempObject = new JSONObject();
             JSONArray profiles = new JSONArray();
-            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            cognitoId = CredentialsManager.getInstance().getCognitoId();
             if(cognitoId == null){
                 setCognitoId();
                 cognitoId = CredentialsManager.getInstance().getCognitoId();
@@ -575,25 +592,8 @@ public class MainActivity extends AppCompatActivity {
                     String profileString = profiles.getString(n);
                     Log.d(TAG, profileString);
                     Profile profile = new Gson().fromJson(profileString, Profile.class);
-//                    JSONObject object = profiles.getJSONObject(n);
-//                    Integer id = Integer.parseInt(object.getString("profileId"));
-//                    String profileName = object.getString("name");
-//                    String imageUrl = object.getString("imageUrl");
-//                    String description = object.getString("description");
-//                    JSONArray jsonAccounts = object.getJSONArray("accounts");
-//                    ArrayList<App> accounts = null;
-//                    for (int i = 0; i < jsonAccounts.length(); ++i) {
-//                        JSONObject account = jsonAccounts.getJSONObject(i);
-//                        ObjectMapper m = new ObjectMapper();
-//                        MyClass myClass = m.readValue(o.toString(), MyClass.class);
-//                        accounts.add(account);
-//                        //....
-//                    }
-//                    //TODO: change app to profile
-//                    Profile profile = new Profile(id, profileName, description, imageUrl, accounts);
                     Log.d(TAG, profile.toString());
-                    //TODO: uncomment and add profile
-                    //profilesArray.add(profile);
+                    profilesArray.add(profile);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -601,7 +601,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
-
         @Override
         protected void onPostExecute(Void result) {
             // populate list
@@ -612,6 +611,7 @@ public class MainActivity extends AppCompatActivity {
                 mPager.setAdapter(mPagerAdapter);
                 mPager.setVisibility(View.VISIBLE);
             });
+            new GetProfiles(mcontext).execute();
             dialog.dismiss();
         }
     }
@@ -694,7 +694,7 @@ public class MainActivity extends AppCompatActivity {
             //connect to API
             JSONObject obj = null;
             JSONArray accounts = new JSONArray();
-            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            cognitoId = CredentialsManager.getInstance().getCognitoId();
             String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
 
             Log.d(TAG, "Cognito ID: " + cognitoId);

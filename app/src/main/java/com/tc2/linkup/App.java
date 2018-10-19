@@ -26,7 +26,6 @@ public class App implements Serializable, Parcelable {
     private String platform;
     private String displayName;
     private String url;
-    //private boolean appSwitchIsOn;
     private String userId;
     private String username;
 
@@ -56,15 +55,6 @@ public class App implements Serializable, Parcelable {
         this.platform = in.readString();
         this.url = in.readString();
         this.username = in.readString();
-        Integer bool = in.readInt();
-//        if (bool == 1) {
-//            setAppSwitchIsOn(true);
-//        } else if (bool == 0) {
-//            setAppSwitchIsOn(false);
-//        } else {
-//            setAppSwitchIsOn(false);
-//            Log.d(TAG, "boolean was not 1 or 0");
-//        }
     }
 
     public int getAccountId() {
@@ -99,14 +89,6 @@ public class App implements Serializable, Parcelable {
         this.url = url;
     }
 
-//    public boolean isAppSwitchIsOn() {
-//        return appSwitchIsOn;
-//    }
-//
-//    public void setAppSwitchIsOn(boolean appSwitchIsOn) {
-//        this.appSwitchIsOn = appSwitchIsOn;
-//    }
-
     public String getUsername() {
         return username;
     }
@@ -127,10 +109,16 @@ public class App implements Serializable, Parcelable {
         dest.writeString(this.platform);
         dest.writeString(this.url);
         dest.writeString(this.username);
-//        if (isAppSwitchIsOn()) {
-//            dest.writeInt(1);
-//        } else dest.writeInt(0);
     }
+
+//    @Override
+//    private void readFromParcel(Parcel in) {
+//        this.accountId = in.readInt();
+//        this.displayName = in.readString();
+//        this.platform = in.readString();
+//        this.url = in.readString();
+//        this.username = in.readString();
+//    }
 
     @Override
     public String toString() {

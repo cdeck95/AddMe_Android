@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -42,10 +43,13 @@ public class EditProfileActivity extends AppCompatActivity {
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         recyclerView = findViewById(R.id.editProfileRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Intent intent = getIntent();
-        profileId = intent.getIntExtra("profileId", -1);
-        accounts = intent.getParcelableArrayListExtra("accounts");
+        Bundle bundle = intent.getExtras();
+        profileId = bundle.getInt("profileId");
+        accounts = bundle.getParcelableArrayList("accounts");
 //        if (intent!=null) {
 //            if(intent.containsKey("profileId")) {
 //                profileId = bundle.getInt("profileId");

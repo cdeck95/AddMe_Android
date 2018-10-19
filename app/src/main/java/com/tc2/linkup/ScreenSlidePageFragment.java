@@ -87,9 +87,11 @@ public class ScreenSlidePageFragment extends Fragment {
                     bottomSheetDialogFragment.show(getFragmentManager(), bottomSheetDialogFragment.getTag());
 
                 } else if (index == 1){
+                    Bundle args3 = new Bundle();
+                    args3.putInt("profileId", profileId);
+                    args3.putParcelableArrayList("accounts", accounts);
                     Intent intent = new Intent(getActivity(), EditProfileActivity.class);
-                    intent.putExtra("profileId", profileId);
-                    intent.putParcelableArrayListExtra("account", accounts);
+                    intent.putExtras(args3);
                     startActivity(intent);
                 } else if (index == 2){
                     //share

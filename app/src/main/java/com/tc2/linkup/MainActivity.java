@@ -339,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
             args.putString("profileImageUrl", profilesArray.get(position).getImageUrl());
             args.putString("profileName", profilesArray.get(position).getName());
             args.putString("profileDescription", profilesArray.get(position).getDescription());
+            args.putParcelableArrayList("accounts", profilesArray.get(position).getAccounts());
             screenSlidePageFragment.setArguments(args);
             return screenSlidePageFragment;
         }

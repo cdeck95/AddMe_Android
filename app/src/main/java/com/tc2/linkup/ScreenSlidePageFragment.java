@@ -89,6 +89,9 @@ public class ScreenSlidePageFragment extends Fragment {
                 } else if (index == 1){
                     Bundle args3 = new Bundle();
                     args3.putInt("profileId", profileId);
+                    args3.putString("profileName", profileNameTV.getText().toString());
+                    args3.putString("profileDescription", profileDescriptionTV.getText().toString());
+                    args3.putString("userFullName", "Chris Deck");
                     args3.putParcelableArrayList("accounts", accounts);
                     Intent intent = new Intent(getActivity(), EditProfileActivity.class);
                     intent.putExtras(args3);

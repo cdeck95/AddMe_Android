@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
@@ -35,13 +36,20 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final String TAG = "EditProfileActivity";
     private String cognitoId = "";
     private Integer profileId = -1;
+    private String profileName;
+    private String profileDescription;
+    private String userFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
+        TextView userFullNameTV = findViewById(R.id.editProfileUserFullName);
+        TextView profileNameTV = findViewById(R.id.editProfileName);
+        TextView profileDesciptionTV = findViewById(R.id.editProfileDescription);
+        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
         recyclerView = findViewById(R.id.editProfileRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -50,35 +58,23 @@ public class EditProfileActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         profileId = bundle.getInt("profileId");
         accounts = bundle.getParcelableArrayList("accounts");
-//        if (intent!=null) {
-//            if(intent.containsKey("profileId")) {
-//                profileId = bundle.getInt("profileId");
-//                if(bundle.containsKey("accounts")) {
-//                    accounts = bundle.getParcelableArrayList("accounts");
-//                } else {
-//                    Log.e(TAG, "bundle does not contain accounts");
-//                }
-//
-//            } else {
-//                Log.e(TAG, "bundle does not contain profileId");
-//            }
-//        } else {
-//            Log.e(TAG, "bundle is null");
-//        }
+        profileName = bundle.getString("profileName");
+        profileDescription = bundle.getString("profileDesciption");
+        userFullName = bundle.getString("userFullName");
 
+        profileNameTV.setText(profileName);
+        profileDesciptionTV.setText(profileDescription);
+        userFullNameTV.setText(userFullName);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             Log.d(TAG, "----Refreshed----");
             populateApps();
-            //new GetAccountsForProfile(this).execute();
-            //populateApps(1, rootView);
             mSwipeRefreshLayout.setRefreshing(false);
             final Snackbar snackBar = Snackbar.make(mSwipeRefreshLayout, "Refreshed", Snackbar.LENGTH_SHORT);
             snackBar.setAction("Dismiss", v -> snackBar.dismiss());
             snackBar.setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
             snackBar.show();
         });
-
 
         populateApps();
     }

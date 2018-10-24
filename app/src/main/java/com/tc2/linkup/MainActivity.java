@@ -339,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
             args.putString("profileImageUrl", profilesArray.get(position).getImageUrl());
             args.putString("profileName", profilesArray.get(position).getName());
             args.putString("profileDescription", profilesArray.get(position).getDescription());
+            args.putParcelableArrayList("accounts", profilesArray.get(position).getAccounts());
             screenSlidePageFragment.setArguments(args);
             return screenSlidePageFragment;
         }
@@ -371,12 +372,6 @@ public class MainActivity extends AppCompatActivity {
                     .progress(true, 0)
                     .progressIndeterminateStyle(true)
                     .show();
-
-//              mProgressDialog = new ProgressDialog(mcontext);
-//              mProgressDialog.setTitle("Contacting Server");
-//              mProgressDialog.setMessage("Loading...");
-//              mProgressDialog.setIndeterminate(false);
-//              mProgressDialog.show();
         }
 
         @Override
@@ -747,7 +742,7 @@ public class MainActivity extends AppCompatActivity {
                     String appUrl = object.getString("url");
                     String platform = object.getString("platform");
                     String username = object.getString("username");
-                    App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
+                    App app = new App(id, displayName, platform, appUrl, username);
                     apps.add(app);
                 } catch (JSONException e) {
                     e.printStackTrace();

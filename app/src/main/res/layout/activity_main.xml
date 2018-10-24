@@ -69,16 +69,16 @@
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/pullToRefresh"
-        android:layout_width="256dp"
-        android:layout_height="200dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/fab"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userNameTV"
-        app:layout_constraintVertical_bias="0.168">
+        app:layout_constraintTop_toBottomOf="@+id/userNameTV">
 
         <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pager"

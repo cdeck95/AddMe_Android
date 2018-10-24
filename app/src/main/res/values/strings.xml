@@ -33,6 +33,7 @@
     <string name="sign_in_message">"You successfully signed-in as %s."</string>
     <string name="profile_name">Profile Name</string>
     <string name="profile_desc">Profile Description</string>
+    <string name="action_save">Save</string>
 
     <string-array name="help_choices">
         <item>"Can't connect accounts"</item>

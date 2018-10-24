@@ -199,7 +199,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                     String appUrl = object.getString("url");
                     String platform = object.getString("platform");
                     String username = object.getString("username");
-                    App app = new App(id, displayName, platform, appUrl, username, Boolean.TRUE);
+                    App app = new App(id, displayName, platform, appUrl, username);
                     apps.add(app);
                 } catch (JSONException e) {
                     e.printStackTrace();

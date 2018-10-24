@@ -44,6 +44,7 @@ public class ScreenSlidePageFragment extends Fragment {
     private ArrayList<Profile> profilesArray = new ArrayList<>();
     Integer profileId = -1;
     String cognitoId;
+    String profileImageUrl;
     private Integer selected = -1;
     private ArrayList<App> accounts;
 
@@ -62,6 +63,7 @@ public class ScreenSlidePageFragment extends Fragment {
         profileId = args.getInt("profileId", -1);
         accounts = args.getParcelableArrayList("accounts");
         cognitoId = CredentialsManager.getInstance().getCognitoId();
+        profileImageUrl = args.getString("profileImageUrl");
 
         profileDescriptionTV.setText(args.getString("profileDescription", "Something went wrong."));
         profileNameTV.setText(args.getString("profileName", "Something went wrong."));
@@ -92,6 +94,7 @@ public class ScreenSlidePageFragment extends Fragment {
                     args3.putString("profileName", profileNameTV.getText().toString());
                     args3.putString("profileDescription", profileDescriptionTV.getText().toString());
                     args3.putString("userFullName", "Chris Deck");
+                    args3.putString("profileImageUrl", profileImageUrl);
                     args3.putParcelableArrayList("accounts", accounts);
                     Intent intent = new Intent(getActivity(), EditProfileActivity.class);
                     intent.putExtras(args3);

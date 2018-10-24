@@ -33,7 +33,7 @@ public class App implements Serializable, Parcelable {
 
     }
 
-    public App(int accountId, String displayName, String platform, String url, String usernameIn, Boolean appSwitchIsOn) {
+    public App(int accountId, String displayName, String platform, String url, String usernameIn) {
         this.accountId = accountId;
         this.displayName = displayName;
         this.platform = platform;

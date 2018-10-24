@@ -1,36 +1,48 @@
 package com.tc2.linkup;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.gson.Gson;
+import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 public class EditProfileActivity extends AppCompatActivity {
 
-    SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView recyclerView;
     ArrayList<App> accounts;
     private static final String TAG = "EditProfileActivity";
@@ -39,17 +51,26 @@ public class EditProfileActivity extends AppCompatActivity {
     private String profileName;
     private String profileDescription;
     private String userFullName;
+    private Profile profile;
+    private TextView userFullNameTV;
+    private TextView profileNameTV;
+    private TextView profileDescriptionTV;
+    private HttpURLConnection urlConnection;
+    private ArrayList<App> allAccounts;
+    private EditProfileAdapter adapter;
+    private String imageUrl;
+    private ImageView profileImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile);
 
-        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
-        TextView userFullNameTV = findViewById(R.id.editProfileUserFullName);
-        TextView profileNameTV = findViewById(R.id.editProfileName);
-        TextView profileDesciptionTV = findViewById(R.id.editProfileDescription);
-        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
+        new GetAllAccounts(getApplicationContext());
+        userFullNameTV = findViewById(R.id.editProfileUserFullName);
+        profileNameTV = findViewById(R.id.editProfileName);
+        profileDescriptionTV = findViewById(R.id.editProfileDescription);
+        profileImageView = findViewById(R.id.editProfileImageView);
         recyclerView = findViewById(R.id.editProfileRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -59,22 +80,22 @@ public class EditProfileActivity extends AppCompatActivity {
         profileId = bundle.getInt("profileId");
         accounts = bundle.getParcelableArrayList("accounts");
         profileName = bundle.getString("profileName");
-        profileDescription = bundle.getString("profileDesciption");
+        profileDescription = bundle.getString("profileDescription");
         userFullName = bundle.getString("userFullName");
+        imageUrl = bundle.getString("profileImageUrl");
+        profile = new Profile();
+        profile.setProfileId(profileId);
+        profile.setAccounts(accounts);
+        profile.setName(profileName);
+        profile.setDescription(profileDescription);
+        profile.setImageUrl(imageUrl);
+
+        DownloadImageWithURLTask downloadTask = new DownloadImageWithURLTask(profileImageView);
+        downloadTask.execute(imageUrl);
 
         profileNameTV.setText(profileName);
-        profileDesciptionTV.setText(profileDescription);
+        profileDescriptionTV.setText(profileDescription);
         userFullNameTV.setText(userFullName);
-
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            Log.d(TAG, "----Refreshed----");
-            populateApps();
-            mSwipeRefreshLayout.setRefreshing(false);
-            final Snackbar snackBar = Snackbar.make(mSwipeRefreshLayout, "Refreshed", Snackbar.LENGTH_SHORT);
-            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
-            snackBar.setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            snackBar.show();
-        });
 
         populateApps();
     }
@@ -85,112 +106,272 @@ public class EditProfileActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.INVISIBLE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
-            RecyclerView.Adapter adapter = new EditProfileAdapter(this, accounts);
+            adapter = new EditProfileAdapter(this, accounts, allAccounts);
             recyclerView.setAdapter(adapter);
         }
 
     }
 
-//    public class GetAccountsForProfile extends AsyncTask<Void, Void, Void> {
-//        String title;
-//        Context mcontext;
-//        MaterialDialog dialog;
-//
-//
-//        public GetAccountsForProfile(Context c) {
-//            mcontext = c;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_edit_profile, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_save) {
+            //save information
+            Log.d(TAG, "saving information....");
+            profile.setAccounts(adapter.getAccountsList());
+            profile.setName(profileNameTV.getText().toString());
+            profile.setDescription(profileDescriptionTV.getText().toString());
+            Log.d(TAG, profile.toString());
+            new SaveProfile(getApplicationContext(), profile).execute();
+        } else if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.action_help) {
+            //Initializing a bottom sheet
+            BottomSheetDialogFragment bottomSheetDialogFragment = new HelpBottomSheetDialogFragment();
+            //show it
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        } else if (id == R.id.action_logout) {
+            //IdentityManager.getDefaultIdentityManager().signOut();
+            IdentityManager.getDefaultIdentityManager().signOut();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private class GetAllAccounts extends AsyncTask<String, Void, Void> {
+        String title;
+        Context mcontext;
+        MaterialDialog dialog;
+
+
+        public GetAllAccounts(Context c) {
+            mcontext = c;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            //connect to API
+            String request = params[0];
+            JSONObject obj = null;
+            JSONArray accounts = new JSONArray();
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
+
+            Log.d(TAG, "Cognito ID: " + cognitoId);
+
+            URL url = null;
+            try {
+                url = new URL(urlIn);
+                Log.d(TAG, "URL: " + urlIn);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod(request);
+
+
+                Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
+                Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
+                if (urlConnection.getResponseCode() == 404) {
+                    Log.e(TAG, "No accounts Found.");
+                } else {
+                    if (urlConnection.getInputStream() != null) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line = in.readLine()) != null) {
+                            builder.append(line);
+                        }
+
+                        Log.d(TAG, "response buffer: " + builder.toString());
+
+                        obj = new JSONObject(builder.toString());
+                        accounts = obj.getJSONArray("accounts");
+                    } else {
+                        Log.d(TAG, "No input stream");
+                        return null;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+
+            allAccounts.clear();
+
+            for (int n = 0; n < accounts.length(); n++) {
+                try {
+                    JSONObject object = accounts.getJSONObject(n);
+                    Integer id = Integer.parseInt(object.getString("accountId"));
+                    String displayName = object.getString("displayName");
+                    String appUrl = object.getString("url");
+                    String platform = object.getString("platform");
+                    String username = object.getString("username");
+                    App app = new App(id, displayName, platform, appUrl, username);
+                    allAccounts.add(app);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            //dialog.dismiss();
+        }
+    }
+
+    class SaveProfile extends AsyncTask<Void, Void, Void> {
+        private static final String TAG = "SaveProfile";
+        String title;
+        Context mcontext;
+        Profile profile;
+        MaterialDialog dialog;
+        HttpURLConnection urlConnection = null;
+
+
+        public SaveProfile(Context c, Profile profile) {
+            mcontext = c;
+            this.profile = profile;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 //            dialog = new MaterialDialog.Builder(mcontext)
 //                    .title("Contacting Server")
 //                    .content("Loading...")
 //                    .progress(true, 0)
 //                    .progressIndeterminateStyle(true)
 //                    .show();
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            //connect to API
-//            JSONObject obj = null;
-//            JSONArray profiles = new JSONArray();
-//            cognitoId = CredentialsManager.getInstance().getCognitoId();
-//            String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/profiles/";
-//
-//            Log.d(TAG, "Cognito ID: " + cognitoId);
-//
-//            URL url = null;
-//            try {
-//                url = new URL(urlIn);
-//                Log.d(TAG, "URL: " + urlIn);
-//                urlConnection = (HttpURLConnection) url.openConnection();
-//
-//                Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
-//                Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
-//                if (urlConnection.getResponseCode() == 404) {
-//                    Log.e(TAG, "No Profiles Found.");
-//                } else {
-//                    if (urlConnection.getInputStream() != null) {
-//                        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-//                        String line;
-//                        StringBuilder builder = new StringBuilder();
-//                        while ((line = in.readLine()) != null) {
-//                            builder.append(line);
-//                        }
-//
-//                        Log.e(TAG, "response buffer: " + builder.toString());
-//
-//                        obj = new JSONObject(builder.toString());
-//                        profiles = obj.getJSONArray("profiles");
-//                        //prefs.edit().putString("accounts", builder.toString()).apply();
-//
-//                    } else {
-//                        Log.d(TAG, "No input stream");
-//                        return null;
-//                    }
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//                if (urlConnection != null) {
-//                    urlConnection.disconnect();
-//                }
-//            }
-//
-//            if(profilesArray != null){
-//                profilesArray.clear();
-//            }
-//
-//            for (int n = 0; n < profiles.length(); n++) {
-//                try {
-//                    String profileString = profiles.getString(n);
-//                    Log.d(TAG, profileString);
-//                    Profile profile = new Gson().fromJson(profileString, Profile.class);
-//                    Log.d(TAG, profile.toString());
-//                    profilesArray.add(profile);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void result) {
-//            // populate list
-//            //TODO:Create populateProfiles
-//            // populateProfiles(1, getView());
-//            //mProgressDialog.dismiss();
-//            MainActivity.this.runOnUiThread(() -> {
-//                mPager.setAdapter(mPagerAdapter);
-//                mPager.setVisibility(View.VISIBLE);
-//            });
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection httpcon;
+            JSONObject tempObject = new JSONObject();
+
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String url = "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profile.getProfileId();
+
+            Log.e(TAG, "Retrieve Data URL: " + url);
+            try {
+                //Connect
+                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+                httpcon.setRequestProperty("Content-Type", "application/json");
+                httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestMethod("PUT");
+                httpcon.connect();
+
+
+                try {
+                   // tempObject.put("profileId", profile.getProfileId());
+                    tempObject.put("name", profile.getName());
+                    tempObject.put("description", profile.getDescription());
+
+                    tempObject.put("imageUrl", profile.getImageUrl());
+                    ArrayList<Integer> profileIds = new ArrayList<>();
+                    for(App app: profile.getAccounts()){
+                        profileIds.add(app.getAccountId());
+                    }
+                    tempObject.putOpt("accounts", profileIds);
+                    Log.d(TAG, tempObject.toString());
+                } catch (JSONException j) {
+                    j.printStackTrace();
+                }
+
+
+                //Write
+                OutputStream os = httpcon.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(tempObject.toString());
+                writer.close();
+                os.close();
+
+                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+                Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+
+
+                if (httpcon.getResponseCode() != 404) {
+                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream());
+                } else {
+                }
+
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // populate list
 //            dialog.dismiss();
-//        }
-//    }
+//            new DroidDialog.Builder(mcontext)
+//                    .icon(R.drawable.ic_action_tick)
+//                    .title("Success!")
+//                    .content("Your profile has been updated.")
+//                    .cancelable(true, true)
+//                    .neutralButton("DISMISS", droidDialog -> {
+//                        droidDialog.dismiss();
+//
+//                    }).show();
+
+            //            final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
+//            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+//            snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
+//            snackBar.show();
+        }
+    }
+
+    private class DownloadImageWithURLTask extends AsyncTask<String,Void,Bitmap>{
+        ImageView profileImage;
+        public DownloadImageWithURLTask(ImageView profileImageIn){
+            this.profileImage = profileImageIn;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... urls) {
+            String pathToFile = urls[0];
+            Bitmap bitmap = null;
+            try {
+                InputStream in = new java.net.URL(pathToFile).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result){
+            profileImage.setImageBitmap(result);
+        }
+    }
 }

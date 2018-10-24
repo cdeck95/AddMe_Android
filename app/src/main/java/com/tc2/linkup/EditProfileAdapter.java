@@ -21,12 +21,15 @@ import java.util.List;
 public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter.EditProfileViewHolder> {
 
     private static final String TAG = "EditProfileAdapter";
+    private final ArrayList<App> allAccounts;
     private Context mContext;
     private ArrayList<App> accountsList;
+    Boolean isOn = false;
 
-    public EditProfileAdapter(Context mContext, ArrayList<App> accountsList) {
+    public EditProfileAdapter(Context mContext, ArrayList<App> accountsList, ArrayList<App> allAccounts) {
         this.mContext = mContext;
         this.accountsList = accountsList;
+        this.allAccounts = allAccounts;
     }
 
     @NonNull
@@ -80,6 +83,26 @@ public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter
                 holder.appImage.setImageResource(R.mipmap.ic_custom); //need custom
                 break;
         }
+
+        holder.accountSwitch.setChecked(true);
+
+        holder.accountSwitch.setOnClickListener(v -> {
+            Log.d(TAG, "Account switch is " + holder.accountSwitch.isChecked());
+            if(holder.accountSwitch.isChecked()){
+                if(accountsList.contains(account)){
+                    //do nothing
+                } else {
+                    accountsList.add(account);
+                }
+            } else {
+                if(accountsList.contains(account)){
+                    accountsList.remove(account);
+                } else {
+                    //do nothing
+                }
+            }
+
+        });
     }
 
     @Override
@@ -105,12 +128,11 @@ public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter
             accountSwitch = itemView.findViewById(R.id.accountSwitch);
             txtAppID = itemView.findViewById(R.id.editProfileAccountId);
             appImage = itemView.findViewById(R.id.accountImage);
-
-            accountSwitch.setOnClickListener(v -> {
-                Log.d(TAG, "Account switch is " + accountSwitch.isChecked());
-            });
-
         }
+    }
+
+    public ArrayList<App> getAccountsList(){
+        return accountsList;
     }
 
 }

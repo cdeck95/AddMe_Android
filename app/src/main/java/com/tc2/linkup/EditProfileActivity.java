@@ -56,7 +56,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private TextView profileNameTV;
     private TextView profileDescriptionTV;
     private HttpURLConnection urlConnection;
-    private ArrayList<App> allAccounts;
+    private ArrayList<App> allAccounts = new ArrayList<>();
     private EditProfileAdapter adapter;
     private String imageUrl;
     private ImageView profileImageView;
@@ -66,7 +66,7 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile);
 
-        new GetAllAccounts(getApplicationContext());
+        new GetAllAccounts(getApplicationContext()).execute();
         userFullNameTV = findViewById(R.id.editProfileUserFullName);
         profileNameTV = findViewById(R.id.editProfileName);
         profileDescriptionTV = findViewById(R.id.editProfileDescription);
@@ -96,12 +96,16 @@ public class EditProfileActivity extends AppCompatActivity {
         profileNameTV.setText(profileName);
         profileDescriptionTV.setText(profileDescription);
         userFullNameTV.setText(userFullName);
+    }
 
-        populateApps();
+    @Override
+    public void onResume() {
+        super.onResume();
+        new GetAllAccounts(getApplicationContext()).execute();
     }
 
     private void populateApps() {
-        if (accounts.size() == 0) {
+        if (allAccounts.size() == 0) {
             Log.d(TAG, "Apps list is empty");
             recyclerView.setVisibility(View.INVISIBLE);
         } else {
@@ -165,13 +169,17 @@ public class EditProfileActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+//            dialog = new MaterialDialog.Builder(mcontext)
+//                    .title("Contacting Server")
+//                    .content("Loading...")
+//                    .progress(true, 0)
+//                    .progressIndeterminateStyle(true)
+//                    .show();
         }
 
         @Override
         protected Void doInBackground(String... params) {
-            //connect to API
-            String request = params[0];
-            JSONObject obj = null;
+            JSONObject obj;
             JSONArray accounts = new JSONArray();
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
             String urlIn = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
@@ -183,7 +191,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod(request);
+                urlConnection.setRequestMethod("GET");
 
 
                 Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
@@ -216,7 +224,9 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
 
-            allAccounts.clear();
+            if(allAccounts != null){
+                allAccounts.clear();
+            }
 
             for (int n = 0; n < accounts.length(); n++) {
                 try {
@@ -238,7 +248,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            //dialog.dismiss();
+             populateApps();
+           //  dialog.dismiss();
         }
     }
 
@@ -271,6 +282,7 @@ public class EditProfileActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             HttpURLConnection httpcon;
             JSONObject tempObject = new JSONObject();
+            JSONObject accounts = new JSONObject();
 
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
             String url = "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profile.getProfileId();
@@ -291,11 +303,11 @@ public class EditProfileActivity extends AppCompatActivity {
                     tempObject.put("description", profile.getDescription());
 
                     tempObject.put("imageUrl", profile.getImageUrl());
-                    ArrayList<Integer> profileIds = new ArrayList<>();
+                    JSONArray profileIds = new JSONArray();
                     for(App app: profile.getAccounts()){
-                        profileIds.add(app.getAccountId());
+                        profileIds.put(app.getAccountId());
                     }
-                    tempObject.putOpt("accounts", profileIds);
+                    tempObject.put("accounts", profileIds);
                     Log.d(TAG, tempObject.toString());
                 } catch (JSONException j) {
                     j.printStackTrace();

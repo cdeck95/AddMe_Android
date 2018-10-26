@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.amazonaws.auth.AWSCognitoIdentityProvider;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.regions.Regions;
@@ -43,7 +41,6 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import org.json.JSONArray;
@@ -61,9 +58,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -85,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
     private String cognitoId;
 
     String defaultImageURL = "https://images.pexels.com/photos/708440/pexels-photo-708440.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
-    private ArrayList<App> apps = new ArrayList<>();
+    private ArrayList<App> allAccounts = new ArrayList<>();
     SwipeRefreshLayout pullToRefresh;
-    // private JSONArray apps = new JSONArray();
+    // private JSONArray allAccounts = new JSONArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -340,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
             args.putString("profileName", profilesArray.get(position).getName());
             args.putString("profileDescription", profilesArray.get(position).getDescription());
             args.putParcelableArrayList("accounts", profilesArray.get(position).getAccounts());
+            args.putParcelableArrayList("allAccounts", allAccounts);
             screenSlidePageFragment.setArguments(args);
             return screenSlidePageFragment;
         }
@@ -521,10 +517,10 @@ public class MainActivity extends AppCompatActivity {
                     tempObject.put("name", profileName);
                     tempObject.put("description", profileDescription);
                     tempObject.put("imageUrl", defaultImageURL);
-                    Log.d(TAG, apps.toString());
+                    Log.d(TAG, allAccounts.toString());
                     JSONArray arrayOfIDs = new JSONArray();
-                    for(int i=0; i<apps.size();i++){
-                        arrayOfIDs.put(apps.get(i).getAccountId());
+                    for(int i = 0; i< allAccounts.size(); i++){
+                        arrayOfIDs.put(allAccounts.get(i).getAccountId());
                     }
                     tempObject.putOpt("accounts", arrayOfIDs);
                     Log.d(TAG, tempObject.toString());
@@ -732,7 +728,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            apps.clear();
+            allAccounts.clear();
 
             for (int n = 0; n < accounts.length(); n++) {
                 try {
@@ -743,7 +739,7 @@ public class MainActivity extends AppCompatActivity {
                     String platform = object.getString("platform");
                     String username = object.getString("username");
                     App app = new App(id, displayName, platform, appUrl, username);
-                    apps.add(app);
+                    allAccounts.add(app);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

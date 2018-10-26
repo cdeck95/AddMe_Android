@@ -23,6 +23,7 @@ public class Profile implements Serializable, Parcelable {
     private String name;
     private String imageUrl;
     private ArrayList<App> accounts;
+    private String cognitoId;
 
     public Profile() {
 
@@ -103,7 +104,7 @@ public class Profile implements Serializable, Parcelable {
     @Override
     public String toString() {
         return "Profile: {" +
-                "id='" + profileId + '\'' +
+                "profileId='" + profileId + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +

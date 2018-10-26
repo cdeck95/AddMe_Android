@@ -36,7 +36,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editProfileUserFullName" />
 
 
-    <TextView
+    <EditText
         android:id="@+id/editProfileName"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -51,7 +51,7 @@
         app:layout_constraintStart_toEndOf="@+id/editProfileImageView"
         app:layout_constraintTop_toTopOf="@+id/editProfileImageView" />
 
-    <TextView
+    <EditText
         android:id="@+id/editProfileDescription"
         android:layout_width="0dp"
         android:layout_height="0dp"

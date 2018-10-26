@@ -47,6 +47,7 @@ public class ScreenSlidePageFragment extends Fragment {
     String profileImageUrl;
     private Integer selected = -1;
     private ArrayList<App> accounts;
+    private ArrayList<App> allAccounts;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +63,7 @@ public class ScreenSlidePageFragment extends Fragment {
         Bundle args = getArguments();
         profileId = args.getInt("profileId", -1);
         accounts = args.getParcelableArrayList("accounts");
+        allAccounts = args.getParcelableArrayList("allAccounts");
         cognitoId = CredentialsManager.getInstance().getCognitoId();
         profileImageUrl = args.getString("profileImageUrl");
 
@@ -91,11 +93,12 @@ public class ScreenSlidePageFragment extends Fragment {
                 } else if (index == 1){
                     Bundle args3 = new Bundle();
                     args3.putInt("profileId", profileId);
-                    args3.putString("profileName", profileNameTV.getText().toString());
-                    args3.putString("profileDescription", profileDescriptionTV.getText().toString());
-                    args3.putString("userFullName", "Chris Deck");
-                    args3.putString("profileImageUrl", profileImageUrl);
-                    args3.putParcelableArrayList("accounts", accounts);
+//                    args3.putString("profileName", profileNameTV.getText().toString());
+//                    args3.putString("profileDescription", profileDescriptionTV.getText().toString());
+//                    args3.putString("userFullName", "Chris Deck");
+//                    args3.putString("profileImageUrl", profileImageUrl);
+//                    args3.putParcelableArrayList("accounts", accounts);
+//                    args3.putParcelableArrayList("allAccounts", allAccounts);
                     Intent intent = new Intent(getActivity(), EditProfileActivity.class);
                     intent.putExtras(args3);
                     startActivity(intent);

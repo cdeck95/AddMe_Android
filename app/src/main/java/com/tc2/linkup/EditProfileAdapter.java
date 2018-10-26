@@ -23,12 +23,12 @@ public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter
     private static final String TAG = "EditProfileAdapter";
     private final ArrayList<App> allAccounts;
     private Context mContext;
-    private ArrayList<App> accountsList;
+    private ArrayList<App> accountsListInProfile;
     Boolean isOn = false;
 
-    public EditProfileAdapter(Context mContext, ArrayList<App> accountsList, ArrayList<App> allAccounts) {
+    public EditProfileAdapter(Context mContext, ArrayList<App> accountsListInProfile, ArrayList<App> allAccounts) {
         this.mContext = mContext;
-        this.accountsList = accountsList;
+        this.accountsListInProfile = accountsListInProfile;
         this.allAccounts = allAccounts;
     }
 
@@ -44,7 +44,7 @@ public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter
 
     @Override
     public void onBindViewHolder(@NonNull EditProfileViewHolder holder, int position) {
-        App account = accountsList.get(position);
+        App account = allAccounts.get(position);
         holder.txtAppDisplayName.setText(account.getDisplayName());
         holder.txtAppUsername.setText("@" + account.getUsername());
         holder.appID = account.getAccountId() + "";
@@ -83,31 +83,34 @@ public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter
                 holder.appImage.setImageResource(R.mipmap.ic_custom); //need custom
                 break;
         }
-
-        holder.accountSwitch.setChecked(true);
+        holder.accountSwitch.setChecked(false);
+       for (App app: accountsListInProfile) {
+           if (app.getAccountId() == account.getAccountId()) {
+               holder.accountSwitch.setChecked(true);
+           }
+       }
 
         holder.accountSwitch.setOnClickListener(v -> {
             Log.d(TAG, "Account switch is " + holder.accountSwitch.isChecked());
+            ArrayList<App> appstoBeRemoved = new ArrayList<>();
             if(holder.accountSwitch.isChecked()){
-                if(accountsList.contains(account)){
-                    //do nothing
-                } else {
-                    accountsList.add(account);
-                }
+                accountsListInProfile.add(account);
             } else {
-                if(accountsList.contains(account)){
-                    accountsList.remove(account);
-                } else {
-                    //do nothing
+                for(App app2: accountsListInProfile){
+                    if(app2.getAccountId() == account.getAccountId()){
+                        appstoBeRemoved.add(app2);
+                    }
                 }
             }
-
+            for(App app: appstoBeRemoved){
+                accountsListInProfile.remove(app);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return accountsList.size();
+        return allAccounts.size();
     }
 
     class EditProfileViewHolder extends RecyclerView.ViewHolder{
@@ -132,7 +135,7 @@ public class EditProfileAdapter  extends RecyclerView.Adapter<EditProfileAdapter
     }
 
     public ArrayList<App> getAccountsList(){
-        return accountsList;
+        return accountsListInProfile;
     }
 
 }

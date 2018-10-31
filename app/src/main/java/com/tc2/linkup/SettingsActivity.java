@@ -1,21 +1,27 @@
 package com.tc2.linkup;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONArray;
@@ -27,6 +33,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -36,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     HttpURLConnection urlConnection = null;
     private Button editBtn, deleteAllBtn;
     private ArrayList<App> apps;
+    private Integer selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout2);
         appList = findViewById(R.id.appsListView2);
         apps = new ArrayList<>();
+
 
         deleteAllBtn = findViewById(R.id.deleteAllBtn2);
         deleteAllBtn.setOnClickListener(v -> {
@@ -92,6 +101,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         new SettingsActivity.Networking(this).execute("GET");
 
         return;
+    }
+
+
+    private void setSelected(Integer selectedIn){
+        this.selected = selectedIn;
     }
 
     private void populateApps(int i, View v) {
@@ -218,6 +232,5 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         }
     }
-
 
 }

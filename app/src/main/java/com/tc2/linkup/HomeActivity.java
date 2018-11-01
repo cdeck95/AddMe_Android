@@ -90,7 +90,7 @@ public class HomeActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.activity_home, container, false);
-
+        setCognitoId();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            Window w = getWindow(); // in Activity's onCreate() for instance
 //            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -146,7 +146,7 @@ public class HomeActivity extends Fragment {
             //openBottomSheet();
         });
 
-        setCognitoId();
+
 
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getContext());
@@ -288,29 +288,7 @@ public class HomeActivity extends Fragment {
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(getContext(), SettingsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_help) {
-            //Initializing a bottom sheet
-            BottomSheetDialogFragment bottomSheetDialogFragment = new HelpBottomSheetDialogFragment();
-            //show it
-            bottomSheetDialogFragment.show(getFragmentManager(), bottomSheetDialogFragment.getTag());
-        } else if (id == R.id.action_logout) {
-            //IdentityManager.getDefaultIdentityManager().signOut();
-            IdentityManager.getDefaultIdentityManager().signOut();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in

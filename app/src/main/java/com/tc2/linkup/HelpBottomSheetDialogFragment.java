@@ -84,7 +84,7 @@ public class HelpBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
             boolean success = EmailIntentBuilder.from(getActivity())
                     .to("support@tc2pro.com")
-                    .subject("" + dataset.get(niceSpinner.getSelectedIndex()))
+                    .subject("LinkUp - Issue - " + dataset.get(niceSpinner.getSelectedIndex()))
                     .body("" + helpTV.getText().toString())
                     .start();
             if (success) {

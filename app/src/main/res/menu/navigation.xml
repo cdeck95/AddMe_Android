@@ -17,12 +17,16 @@
         android:title="Import Code" />
 
     <item
-        android:id="@+id/help"
-        android:icon="@drawable/help"
-        android:title="Help" />
+        android:id="@+id/MyLinks"
+        android:icon="@drawable/androidicon"
+        android:title="MyLinks" />
+<!--<item-->
+        <!--android:id="@+id/help"-->
+        <!--android:icon="@drawable/help"-->
+        <!--android:title="Help" />-->
 
-    <item
-        android:id="@+id/more"
-        android:icon="@drawable/more"
-        android:title="more" />
+    <!--<item-->
+        <!--android:id="@+id/more"-->
+        <!--android:icon="@drawable/more"-->
+        <!--android:title="more" />-->
 </menu>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/constraintLayout">
+
+    <ImageView
+        android:id="@+id/scannedProfileImageView"
+        android:layout_width="110dp"
+        android:layout_height="116dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/scannedProfileUserFullName"
+        app:layout_constraintEnd_toStartOf="@+id/scannedProfileName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/androidicon" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/scannedProfileRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:paddingBottom="10dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scannedProfileUserFullName" />
+
+
+    <TextView
+        android:id="@+id/scannedProfileName"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="Profile Name"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/scannedProfileDescription"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/scannedProfileImageView"
+        app:layout_constraintTop_toTopOf="@+id/scannedProfileImageView" />
+
+    <TextView
+        android:id="@+id/scannedProfileDescription"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Profile Description"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/scannedProfileImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/scannedProfileName"
+        app:layout_constraintTop_toBottomOf="@+id/scannedProfileName"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/scannedProfileUserFullName"
+        android:layout_width="0dp"
+        android:layout_height="23dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Name"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/scannedProfileRecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/scannedProfileImageView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/scannedProfileImageView"
+        app:layout_constraintTop_toBottomOf="@+id/scannedProfileImageView" />
+</android.support.constraint.ConstraintLayout>

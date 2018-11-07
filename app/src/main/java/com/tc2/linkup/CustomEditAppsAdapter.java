@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -263,10 +264,48 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                 try {
                     if(selected == 1){
                         tempObject.put("username", newUsername);
+                        switch (singleApp.getPlatform()) {
+                            case "Facebook":
+                                tempObject.put("url", "https://www.facebook.com/" + (newUsername));
+                                break;
+                            case "Twitter":
+                                tempObject.put("url", "https://www.twitter.com/" + (newUsername));
+                                break;
+                            case "Instagram":
+                                tempObject.put("url", "https://www.instagram.com/" + (newUsername));
+                                break;
+                            case "Snapchat":
+                                tempObject.put("url", "https://www.snapchat.com/add/" + (newUsername));
+                                break;
+                            case "LinkedIn":
+                                tempObject.put("url", "https://www.linkedin.com/in/" + (newUsername));
+                                break;
+                            case "GooglePlus":
+                                tempObject.put("url", "https://www.plus.google.com/" + (newUsername));
+                                break;
+                            case "Xbox":
+                                String usernameURL = URLEncoder.encode(newUsername, "utf-8");
+                                tempObject.put("url", "https://account.xbox.com/en-us/Profile?GamerTag=" + (usernameURL));
+                                break;
+                            case "PSN":
+                                usernameURL = URLEncoder.encode(newUsername, "utf-8");
+                                tempObject.put("url", "https://my.playstation.com/profile/" + (usernameURL));
+                                break;
+                            case "Twitch":
+                                tempObject.put("url", "https://m.twitch.tv/" + newUsername + "/profile");
+                                break;
+                            case "Custom":
+                                tempObject.put("url", newUsername);
+                                break;
+                            default:
+                                Log.d(TAG, "unknown app found: " + singleApp.getPlatform());
+                        }
                         tempObject.put("displayName", singleApp.getDisplayName());
+
                     } else {
                         tempObject.put("username", singleApp.getUsername());
                         tempObject.put("displayName", newDisplayName);
+                        tempObject.put("url", singleApp.getUrl());
                     }
 
                     tempObject.put("platform", singleApp.getPlatform());

@@ -1,17 +1,26 @@
 package com.tc2.linkup;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +28,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
@@ -33,6 +46,8 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     View contentView;
     String cognitoId;
     Integer profileId;
+    // Uri for image path
+    private static Uri imageUri = null;
 
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
@@ -80,31 +95,65 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e(TAG, "Refreshing...");
+                new DownloadImageWithURLTask(imageView).execute( "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profileId + "/qr");
+                Log.e(TAG, "Refreshing Qr code...");
+//                final Snackbar snackBar = Snackbar.make(getActivity().findViewById(R.id.personalCodeLayout), "Refreshed", Snackbar.LENGTH_SHORT);
+//                snackBar.setAction("Dismiss", v2 -> snackBar.dismiss());
+//                snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+//                snackBar.show();
             }
         });
 
         shareButton = contentView.findViewById(R.id.shareButton);
         shareButton.setOnClickListener(v -> {
-//                Bitmap icon = mBitmap;
-//                Intent share = new Intent(Intent.ACTION_SEND);
-//                share.setType("image/jpeg");
-//                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//                icon.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-//                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
-//                try {
-//                    f.createNewFile();
-//                    FileOutputStream fo = new FileOutputStream(f);
-//                    fo.write(bytes.toByteArray());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/temporary_file.jpg"));
-//                startActivity(Intent.createChooser(share, "Share Image"));
+            try {
+                Bitmap bitmap = getBitmapFromView(imageView);
+                File cachePath = new File(getContext().getCacheDir(), "images");
+                cachePath.mkdirs(); // don't forget to make the directory
+                FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                stream.close();
+                shareImage();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
     }
 
+    private Bitmap getBitmapFromView(View view) {
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        Drawable bgDrawable =view.getBackground();
+        if (bgDrawable!=null) {
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        }   else{
+            //does not have background drawable, then draw white background on the canvas
+            canvas.drawColor(Color.WHITE);
+        }
+        view.draw(canvas);
+        return returnedBitmap;
+    }
+
+    private void shareImage(){
+        File imagePath = new File(getContext().getCacheDir(), "images");
+        File newFile = new File(imagePath, "image.png");
+        Uri contentUri = FileProvider.getUriForFile(getContext(), "com.tc2.linkup.fileprovider", newFile);
+
+        if (contentUri != null) {
+
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+            shareIntent.setDataAndType(contentUri, getContext().getContentResolver().getType(contentUri));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            startActivity(Intent.createChooser(shareIntent, "Choose an app"));
+
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

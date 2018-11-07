@@ -18,6 +18,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,73 +95,65 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e(TAG, "Refreshing...");
+                new DownloadImageWithURLTask(imageView).execute( "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profileId + "/qr");
+                Log.e(TAG, "Refreshing Qr code...");
+//                final Snackbar snackBar = Snackbar.make(getActivity().findViewById(R.id.personalCodeLayout), "Refreshed", Snackbar.LENGTH_SHORT);
+//                snackBar.setAction("Dismiss", v2 -> snackBar.dismiss());
+//                snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+//                snackBar.show();
             }
         });
 
         shareButton = contentView.findViewById(R.id.shareButton);
         shareButton.setOnClickListener(v -> {
-//                Bitmap icon = mBitmap;
-//                Intent share = new Intent(Intent.ACTION_SEND);
-//                share.setType("image/jpeg");
-//                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//                icon.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-//                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
-//                try {
-//                    f.createNewFile();
-//                    FileOutputStream fo = new FileOutputStream(f);
-//                    fo.write(bytes.toByteArray());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/temporary_file.jpg"));
-//                startActivity(Intent.createChooser(share, "Share Image"));
-            // share image
-            Uri bmpUri = getLocalBitmapUri(imageView);
-            if (bmpUri != null) {
-                // Construct a ShareIntent with link to image
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-                shareIntent.setType("image/*");
-                // Launch sharing dialog for image
-                startActivity(Intent.createChooser(shareIntent, "Share Image"));
-            } else {
-                // ...sharing failed, handle error
+            try {
+                Bitmap bitmap = getBitmapFromView(imageView);
+                File cachePath = new File(getContext().getCacheDir(), "images");
+                cachePath.mkdirs(); // don't forget to make the directory
+                FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                stream.close();
+                shareImage();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
 
     }
 
-    // Returns the URI path to the Bitmap displayed in specified ImageView
-    public Uri getLocalBitmapUri(ImageView imageView) {
-        // Extract Bitmap from ImageView drawable
-        Drawable drawable = imageView.getDrawable();
-        Bitmap bmp = null;
-        if (drawable instanceof BitmapDrawable){
-            bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        } else {
-            return null;
+    private Bitmap getBitmapFromView(View view) {
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        Drawable bgDrawable =view.getBackground();
+        if (bgDrawable!=null) {
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        }   else{
+            //does not have background drawable, then draw white background on the canvas
+            canvas.drawColor(Color.WHITE);
         }
-        // Store image to default external storage directory
-        Uri bmpUri = null;
-        try {
-            // Use methods on Context to access package-specific directories on external storage.
-            // This way, you don't need to request external read/write permission.
-            // See https://youtu.be/5xVh-7ywKpE?t=25m25s
-            File file =  new File((Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
-            FileOutputStream out = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
-            out.close();
-            // **Warning:** This will fail for API >= 24, use a FileProvider as shown below instead.
-            bmpUri = Uri.fromFile(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bmpUri;
+        view.draw(canvas);
+        return returnedBitmap;
     }
 
+    private void shareImage(){
+        File imagePath = new File(getContext().getCacheDir(), "images");
+        File newFile = new File(imagePath, "image.png");
+        Uri contentUri = FileProvider.getUriForFile(getContext(), "com.tc2.linkup.fileprovider", newFile);
 
+        if (contentUri != null) {
+
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+            shareIntent.setDataAndType(contentUri, getContext().getContentResolver().getType(contentUri));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            startActivity(Intent.createChooser(shareIntent, "Choose an app"));
+
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

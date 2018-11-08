@@ -37,7 +37,7 @@ public class ImportCodeActivity extends Fragment {
         importCodeButton.setOnClickListener(v -> {
             //get image and read QR code
 
-            Integer profileId = 90;
+            Integer profileId = 92;
             new ScanProfile(getContext(), profileId).execute();
             Bundle bundle = new Bundle();
             bundle.putInt("profileId", profileId);

@@ -72,9 +72,9 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
             if (result.getContents() == null) {
                 llSearch.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
-                new ScanCodeActivity.ScanProfile(getContext(), 90).execute();
+                new ScanCodeActivity.ScanProfile(getContext(), 92).execute();
                 Bundle bundle = new Bundle();
-                bundle.putInt("profileId", 90);
+                bundle.putInt("profileId", 92);
                 Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);

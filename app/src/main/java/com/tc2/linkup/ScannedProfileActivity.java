@@ -166,8 +166,14 @@ public class ScannedProfileActivity extends AppCompatActivity {
             profileNameTV.setText(profile.getName());
             profileDescriptionTV.setText(profile.getDescription());
             userFullNameTV.setText("Chris Deck");
-            ScannedProfileActivity.DownloadImageWithURLTask downloadTask = new ScannedProfileActivity.DownloadImageWithURLTask(profileImageView);
-            downloadTask.execute(profile.getImageUrl());
+
+            if(profile.getImageUrl() == null){
+               profileImageView.setImageDrawable(getDrawable(R.drawable.androidicon));
+            } else{
+                ScannedProfileActivity.DownloadImageWithURLTask downloadTask = new ScannedProfileActivity.DownloadImageWithURLTask(profileImageView);
+                downloadTask.execute(profile.getImageUrl());
+            }
+
             //  dialog.dismiss();
         }
     }
@@ -186,8 +192,12 @@ public class ScannedProfileActivity extends AppCompatActivity {
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
-                e.printStackTrace();
+                if(e.getMessage() == null){
+                    e.printStackTrace();
+                }
+                else {
+                    Log.d(TAG, e.getMessage());
+                }
             }
 
             return bitmap;

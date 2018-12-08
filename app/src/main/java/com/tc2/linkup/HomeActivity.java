@@ -3,9 +3,10 @@ package com.tc2.linkup;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,28 +22,24 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.regions.Regions;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.gson.Gson;
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +47,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -62,6 +61,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.app.Activity.RESULT_OK;
 
 
 public class HomeActivity extends Fragment {
@@ -80,10 +80,11 @@ public class HomeActivity extends Fragment {
     private FloatingActionButton addAppButton;
     private Integer selected = -1;
     private String cognitoId;
-
+    private static final int SELECT_PHOTO = 100;
     String defaultImageURL = "https://images.pexels.com/photos/708440/pexels-photo-708440.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
     private ArrayList<App> allAccounts = new ArrayList<>();
     SwipeRefreshLayout pullToRefresh;
+    ImageView profileImage;
     // private JSONArray allAccounts = new JSONArray();
 
     @Override
@@ -106,6 +107,13 @@ public class HomeActivity extends Fragment {
                         ContextCompat.getColor(getContext(), R.color.GColor2)});
 
         rootView.findViewById(R.id.background).setBackground(gradientDrawable);
+        profileImage = rootView.findViewById(R.id.profileImage);
+
+        profileImage.setOnClickListener(v -> {
+            Intent photoPic = new Intent(Intent.ACTION_PICK);
+            photoPic.setType("image/*");
+            startActivityForResult(photoPic, SELECT_PHOTO);
+        });
 
         Permissions();
 
@@ -212,6 +220,30 @@ public class HomeActivity extends Fragment {
 //        // binding with ViewPager
 //        bind.bnve.setupWithViewPager(bind.vp);
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        switch (requestCode) {
+            case SELECT_PHOTO:
+                if (resultCode == RESULT_OK) {
+//doing some uri parsing
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    InputStream imageStream = null;
+                    try {
+                        //getting the image
+                        imageStream = getActivity().getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+
+                    //decoding bitmap
+                    Bitmap bMap = BitmapFactory.decodeStream(imageStream);
+                    profileImage.setImageBitmap(bMap);
+                }
+        }
     }
 
     private void enableDisableSwipeRefresh(boolean enable) {

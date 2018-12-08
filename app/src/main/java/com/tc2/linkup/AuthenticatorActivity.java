@@ -12,7 +12,6 @@ import android.util.Log;
 import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.mobile.auth.core.SignInStateChangeListener;
 import com.amazonaws.mobile.auth.facebook.FacebookButton;
-import com.amazonaws.mobile.auth.google.GoogleButton;
 import com.amazonaws.mobile.auth.ui.AuthUIConfiguration;
 import com.amazonaws.mobile.auth.ui.SignInUI;
 import com.amazonaws.mobile.client.AWSMobileClient;
@@ -21,7 +20,6 @@ import com.amazonaws.mobile.client.AWSStartupResult;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
 
 public class AuthenticatorActivity extends AppCompatActivity {
 
@@ -41,7 +39,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
                     @Override
                     public void onUserSignedIn() {
-                        Log.d(TAG, "User Signed In");
+                        IdentityManager.getDefaultIdentityManager();
                     }
 
                     // Sign-out listener
@@ -65,8 +63,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
                         new AuthUIConfiguration.Builder()
                                 .userPools(true)  // true? show the Email and Password UI
                                 .signInButton(FacebookButton.class) // Show Facebook button
-                                .signInButton(GoogleButton.class) // Show Google button
-                                .logoResId(R.mipmap.ic_launcher) // Change the logo
+                               // .signInButton(GoogleButton.class) // Show Google button
+                                .logoResId(R.mipmap.linkuplogo) // Change the logo
                                 .backgroundColor(Color.WHITE) // Change the backgroundColor
                                 .isBackgroundColorFullScreen(true) // Full screen backgroundColor the backgroundColor full screenff
                                 .fontFamily("sans-serif-light") // Apply sans-serif-light as the global font

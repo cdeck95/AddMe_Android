@@ -127,7 +127,6 @@ public class ScansAdapter  extends RecyclerView.Adapter<ScansAdapter.ScansViewHo
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
                 e.printStackTrace();
             }
 

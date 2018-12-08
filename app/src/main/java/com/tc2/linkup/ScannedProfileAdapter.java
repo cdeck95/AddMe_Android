@@ -90,6 +90,7 @@ public class ScannedProfileAdapter extends RecyclerView.Adapter<ScannedProfileAd
     public void openWebPage(String url) {
         try {
             Uri webpage = Uri.parse(url);
+            Log.d(TAG, webpage+"");
             Intent myIntent = new Intent(Intent.ACTION_VIEW, webpage);
             mContext.startActivity(myIntent);
         } catch (ActivityNotFoundException e) {

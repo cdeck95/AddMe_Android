@@ -444,8 +444,12 @@ public class EditProfileActivity extends AppCompatActivity {
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
-                e.printStackTrace();
+                if(e.getMessage() == null){
+                    e.printStackTrace();
+                }
+                 else {
+                    Log.d(TAG, e.getMessage());
+                }
             }
 
             return bitmap;

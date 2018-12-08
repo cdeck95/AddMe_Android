@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,12 +28,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.crowdfire.cfalertdialog.CFAlertDialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 
@@ -48,6 +53,7 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
     Integer profileId;
     // Uri for image path
     private static Uri imageUri = null;
+    private Integer selected;
 
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
@@ -63,6 +69,7 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
         public void onSlide(@NonNull View bottomSheet, float slideOffset) {
         }
     };
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -106,21 +113,80 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
 
         shareButton = contentView.findViewById(R.id.shareButton);
         shareButton.setOnClickListener(v -> {
-            try {
-                Bitmap bitmap = getBitmapFromView(imageView);
-                File cachePath = new File(getContext().getCacheDir(), "images");
-                cachePath.mkdirs(); // don't forget to make the directory
-                FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                stream.close();
-                shareImage();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            CFAlertDialog.Builder builder = new CFAlertDialog.Builder(getContext())
+                    .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
+                    .setTitle("What would you like to add?");
+            builder.setSingleChoiceItems(new String[]{"Save Image", "Share Image"}, 3, (dialogInterface, index) ->
+            {
+                setSelected(index);
+                Toast.makeText(getContext(), "Selected:"+index, Toast.LENGTH_SHORT).show();
+            });
+            builder.addButton("DONE", -1, -1, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.END, (dialogInterface, i) ->
+            {
+                Toast.makeText(getContext(), "Selected:"+selected, Toast.LENGTH_SHORT).show();
+                if(selected == 1){
+                    try {
+                        Bitmap bitmap = getBitmapFromView(imageView);
+                        File cachePath = new File(getContext().getCacheDir(), "images");
+                        cachePath.mkdirs(); // don't forget to make the directory
+                        FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        stream.close();
+                        shareImage();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Bitmap bitmap = getBitmapFromView(imageView);
+                    saveImageToExternalStorage(bitmap);
+                    Toast.makeText(contentView.getContext(), "Saved successfully, Check gallery", Toast.LENGTH_SHORT).show();
+                }
+                dialogInterface.dismiss();
+            });
+
+            // Show the alert
+            builder.show();
+
         });
 
+    }
+
+    private void saveImageToExternalStorage(Bitmap finalBitmap) {
+        String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+        File myDir = new File(root + "/saved_images_1");
+        myDir.mkdirs();
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "Image-" + n + ".jpg";
+        File file = new File(myDir, fname);
+        if (file.exists())
+            file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        // Tell the media scanner about the new file so that it is
+        // immediately available to the user.
+        MediaScannerConnection.scanFile(getContext(), new String[]{file.toString()}, null,
+                (path, uri) -> {
+                    Log.i("ExternalStorage", "Scanned " + path + ":");
+                    Log.i("ExternalStorage", "-> uri=" + uri);
+                });
+
+    }
+
+    private void setSelected(Integer selectedIn){
+        this.selected = selectedIn;
     }
 
     private Bitmap getBitmapFromView(View view) {

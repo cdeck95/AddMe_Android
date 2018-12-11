@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,6 +23,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.util.Base64;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
@@ -47,6 +51,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -242,6 +247,11 @@ public class HomeActivity extends Fragment {
                     //decoding bitmap
                     Bitmap bMap = BitmapFactory.decodeStream(imageStream);
                     profileImage.setImageBitmap(bMap);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] imageBytes = baos.toByteArray();
+                    String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+                    new POSTImage(getContext(), imageString).execute();
                 }
         }
     }
@@ -446,6 +456,216 @@ public class HomeActivity extends Fragment {
             }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // populate list
+            //TODO:Create populateProfiles
+            // populateProfiles(1, getView());
+            //mProgressDialog.dismiss();
+            getActivity().runOnUiThread(() -> {
+                mPager.setAdapter(mPagerAdapter);
+                mPager.setVisibility(View.VISIBLE);
+            });
+            dialog.dismiss();
+        }
+    }
+
+    public class POSTImage extends AsyncTask<Void, Void, Void> {
+        String title;
+        Context mcontext;
+        MaterialDialog dialog;
+        String imageString;
+        JSONObject postParams;
+        String presignedURL;
+
+        public POSTImage(Context c, String imageStringIn) {
+            mcontext = c;
+            imageString = imageStringIn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            dialog = new MaterialDialog.Builder(mcontext)
+                    .title("Contacting Server")
+                    .content("Loading...")
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection httpcon;
+            JSONObject tempObject = new JSONObject();
+
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String url = "https://api.tc2pro.com/users/" + cognitoId + "/images/";
+
+            Log.e(TAG, "Retrieve Data URL: " + url);
+            try {
+                //Connect
+                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+                httpcon.setRequestProperty("Content-Type", "application/json");
+                httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestMethod("POST");
+                httpcon.connect();
+
+//                try {
+//                    tempObject.put("username", bitmap);
+//                    Log.d(TAG, tempObject.toString());
+//                } catch (JSONException j) {
+//                    j.printStackTrace();
+//                }
+
+
+                //Write
+                OutputStream os = httpcon.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(tempObject.toString());
+                writer.close();
+                os.close();
+
+                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+                Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+
+
+                if (httpcon.getResponseCode() == 404) {
+                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream().toString());
+                } else {
+                    if (httpcon.getInputStream() != null) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line = in.readLine()) != null) {
+                            builder.append(line);
+                        }
+                        Log.e(TAG, "response buffer: " + builder.toString());
+                        JSONObject jsonObject = new JSONObject(builder.toString());
+                        postParams = jsonObject.getJSONObject("fields");
+                        postParams.put("file", imageString);
+                        Log.d(TAG, "base 64 encoded bitmap: "  + imageString);
+                        presignedURL = jsonObject.getString("url");
+                    }
+                }
+            }
+            catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // populate list
+            //TODO:Create populateProfiles
+            // populateProfiles(1, getView());
+            //mProgressDialog.dismiss();
+            getActivity().runOnUiThread(() -> {
+                mPager.setAdapter(mPagerAdapter);
+                mPager.setVisibility(View.VISIBLE);
+            });
+            dialog.dismiss();
+            new POSTImageToAWS(getContext(), presignedURL, postParams).execute();
+        }
+    }
+
+    public class POSTImageToAWS extends AsyncTask<Void, Void, Void> {
+        String title;
+        Context mcontext;
+        MaterialDialog dialog;
+        JSONObject postParams;
+        String presignedURL;
+
+        public POSTImageToAWS(Context c, String presignedURLIn, JSONObject postParamsIn) {
+            mcontext = c;
+            postParams = postParamsIn;
+            presignedURL = presignedURLIn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            dialog = new MaterialDialog.Builder(mcontext)
+                    .title("Contacting Server")
+                    .content("Loading...")
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection httpcon;
+            JSONObject tempObject = new JSONObject();
+
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String url = presignedURL;
+
+            Log.e(TAG, "Presigned URL: " + url);
+            try {
+                //Connect
+                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+                httpcon.setRequestProperty("Content-Type", "application/json");
+                httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestMethod("POST");
+                httpcon.setRequestProperty("http.keepAlive", "true");
+                httpcon.setDoOutput(true);
+
+                //Write
+                OutputStream os = httpcon.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(postParams.toString());
+                Log.d(TAG, postParams.toString());
+                Log.d(TAG, postParams.getString("file"));
+                writer.flush();
+                writer.close();
+                os.close();
+                httpcon.connect();
+
+                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+                Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+                Log.e(TAG, "Other: " + httpcon.toString());
+
+
+                if (httpcon.getResponseCode() == 404) {
+                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream().toString());
+                } else {
+                    if (httpcon.getInputStream() != null) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line = in.readLine()) != null) {
+                            builder.append(line);
+                        }
+                        Log.e(TAG, "response buffer: " + builder.toString());
+                    }
+                }
+            }
+            catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch(AmazonServiceException e) {
+                // The call was transmitted successfully, but Amazon S3 couldn't process
+                // it, so it returned an error response.
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
 
         @Override
         protected void onPostExecute(Void result) {

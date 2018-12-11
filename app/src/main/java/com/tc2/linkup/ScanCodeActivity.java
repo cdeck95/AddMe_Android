@@ -47,10 +47,28 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
 
         fragment = this;
 
-        tvData= rootView.findViewById(R.id.tvData);
-        btnQRScan= rootView.findViewById(R.id.btnQRScan);
+        Intent intent=new Intent(rootView.getContext(), QRScanner.class);
+//                intent.putExtra(EasyQR.IS_TOOLBAR_SHOW,true);
+//                intent.putExtra(EasyQR.TOOLBAR_DRAWABLE_ID,R.drawable.ic_audiotrack_dark);
+//                intent.putExtra(EasyQR.TOOLBAR_TEXT,"My QR");
+//                intent.putExtra(EasyQR.TOOLBAR_BACKGROUND_COLOR,"#0588EE");
+//                intent.putExtra(EasyQR.TOOLBAR_TEXT_COLOR,"#FFFFFF");
+//                intent.putExtra(EasyQR.BACKGROUND_COLOR,"#000000");
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_LEFT,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_TOP,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_RIGHT,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_BOTTOM,50);
+        intent.putExtra(EasyQR.CAMERA_BORDER,100);
+        intent.putExtra(EasyQR.CAMERA_BORDER_COLOR,"#C1000000");
+        intent.putExtra(EasyQR.IS_SCAN_BAR,true);
+        intent.putExtra(EasyQR.IS_BEEP,true);
+        intent.putExtra(EasyQR.BEEP_RESOURCE_ID,R.raw.beep);
+        startActivityForResult(intent, EasyQR.QR_SCANNER_REQUEST);
 
-        btnQRScan.setOnClickListener(this);
+//        tvData= rootView.findViewById(R.id.tvData);
+//        btnQRScan= rootView.findViewById(R.id.btnQRScan);
+//
+//        btnQRScan.setOnClickListener(this);
 
 //        scanBtn = rootView.findViewById(R.id.scan_button);
 //        tvScanFormat = rootView.findViewById(R.id.tvScanFormat);

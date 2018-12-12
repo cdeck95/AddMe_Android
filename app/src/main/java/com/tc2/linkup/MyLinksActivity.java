@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -25,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class MyLinksActivity extends Fragment {
@@ -68,7 +70,7 @@ public class MyLinksActivity extends Fragment {
     }
 
     private void populateScans() {
-        adapter = new ScansAdapter(getActivity(), scans);
+        adapter = new ScansAdapter(getContext(), getActivity(), scans);
         scansRecyclerView.setAdapter(adapter);
     }
 
@@ -136,6 +138,21 @@ public class MyLinksActivity extends Fragment {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

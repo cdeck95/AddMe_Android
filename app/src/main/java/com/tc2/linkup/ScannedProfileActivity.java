@@ -21,6 +21,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.amazonaws.regions.Regions;
+import com.droidbyme.dialoglib.DroidDialog;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class ScannedProfileActivity extends AppCompatActivity {
@@ -189,6 +191,21 @@ public class ScannedProfileActivity extends AppCompatActivity {
                         return null;
                     }
                 }
+            }  catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -233,6 +250,21 @@ public class ScannedProfileActivity extends AppCompatActivity {
             try {
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
+            }  catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    runOnUiThread(() -> {
+                        new DroidDialog.Builder(getApplicationContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch (Exception e) {
                 if(e.getMessage() == null){
                     e.printStackTrace();

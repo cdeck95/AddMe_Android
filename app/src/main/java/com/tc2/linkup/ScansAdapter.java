@@ -1,5 +1,6 @@
 package com.tc2.linkup;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONObject;
 
@@ -26,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 public class ScansAdapter  extends RecyclerView.Adapter<ScansAdapter.ScansViewHolder> {
 
@@ -34,9 +37,11 @@ public class ScansAdapter  extends RecyclerView.Adapter<ScansAdapter.ScansViewHo
     private Scan scans;
     View customView;
     HttpURLConnection urlConnection;
+    Activity activity;
 
-    public ScansAdapter(Context mContext, Scan scans) {
+    public ScansAdapter(Context mContext, Activity activityIn, Scan scans) {
         this.mContext = mContext;
+        activity = activityIn;
         this.scans = scans;
     }
 
@@ -118,6 +123,22 @@ public class ScansAdapter  extends RecyclerView.Adapter<ScansAdapter.ScansViewHo
             try {
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
+            }
+            catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    activity.runOnUiThread(() -> {
+                        new DroidDialog.Builder(mContext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -188,6 +209,21 @@ public class ScansAdapter  extends RecyclerView.Adapter<ScansAdapter.ScansViewHo
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            }  catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    activity.runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

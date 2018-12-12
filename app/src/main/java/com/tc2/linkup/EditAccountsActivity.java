@@ -1,5 +1,6 @@
 package com.tc2.linkup;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class EditAccountsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -37,11 +39,14 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
     private Button editBtn, deleteAllBtn;
     private ArrayList<App> apps;
     private Integer selected;
+    Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_accounts);
+
+        activity = this;
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout2);
         appList = findViewById(R.id.appsListView2);
@@ -108,6 +113,7 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
         } else {
             appList.setVisibility(View.VISIBLE);
             ListAdapter adapter = new CustomEditAppsAdapter(this, 0, apps);
+            ((CustomEditAppsAdapter) adapter).setActivity(this);
             appList.setAdapter(adapter);
         }
 
@@ -189,7 +195,22 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                     runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {

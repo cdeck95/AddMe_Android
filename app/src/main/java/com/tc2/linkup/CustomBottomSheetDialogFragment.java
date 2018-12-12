@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 
 
 public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
@@ -185,152 +186,167 @@ public class CustomBottomSheetDialogFragment extends BottomSheetDialogFragment {
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
-}
-
-class Networking extends AsyncTask<Void, Void, Void> {
-    private static final String TAG = "Networking_AddApp";
-    String title;
-    Context mcontext;
-    View mView;
-    String userName, displayName, platform;
-    App app;
-    ProgressDialog mProgressDialog;
-    HttpURLConnection urlConnection = null;
+    private class Networking extends AsyncTask<Void, Void, Void> {
+        private static final String TAG = "Networking_AddApp";
+        String title;
+        Context mcontext;
+        View mView;
+        String userName, displayName, platform;
+        App app;
+        ProgressDialog mProgressDialog;
+        HttpURLConnection urlConnection = null;
 
 
-    public Networking(View v, Context c, String userName, String display_name, String platform) {
-        mcontext = c;
-        mView = v;
-        this.userName = userName;
-        this.displayName = display_name;
-        this.platform = platform;
-        app = new App();
-    }
+        public Networking(View v, Context c, String userName, String display_name, String platform) {
+            mcontext = c;
+            mView = v;
+            this.userName = userName;
+            this.displayName = display_name;
+            this.platform = platform;
+            app = new App();
+        }
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        mProgressDialog = new ProgressDialog(mcontext);
-        mProgressDialog.setTitle("Contacting Server");
-        mProgressDialog.setMessage("Loading...");
-        mProgressDialog.setIndeterminate(false);
-        mProgressDialog.show();
-    }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(mcontext);
+            mProgressDialog.setTitle("Contacting Server");
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.show();
+        }
 
-    @Override
-    protected Void doInBackground(Void... params) {
-        HttpURLConnection httpcon;
-        JSONObject tempObject = new JSONObject();
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection httpcon;
+            JSONObject tempObject = new JSONObject();
 
-        String cognitoId = CredentialsManager.getInstance().getCognitoId();
-        String url = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String url = "https://api.tc2pro.com/users/" + cognitoId + "/accounts/";
 
-        Log.e(TAG, "Retrieve Data URL: " + url);
-        try {
-            //Connect
-            httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
-            httpcon.setRequestProperty("Content-Type", "application/json");
-            httpcon.setRequestProperty("Accept", "application/json");
-            httpcon.setRequestMethod("POST");
-            httpcon.connect();
+            Log.e(TAG, "Retrieve Data URL: " + url);
+            try {
+                //Connect
+                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+                httpcon.setRequestProperty("Content-Type", "application/json");
+                httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestMethod("POST");
+                httpcon.connect();
 
-            //Make JSON
+                //Make JSON
 //             {
 //                  "displayName": "string",
 //                  "platform": "string",
 //                  "url": "string"
 //             }
-            try {
-                tempObject.put("username", userName);
-                tempObject.put("displayName", displayName);
-                tempObject.put("platform", platform);
-                switch (platform) {
-                    case "Facebook":
-                        tempObject.put("url", "https://www.facebook.com/" + (userName));
-                        break;
-                    case "Twitter":
-                        tempObject.put("url", "https://www.twitter.com/" + (userName));
-                        break;
-                    case "Instagram":
-                        tempObject.put("url", "https://www.instagram.com/" + (userName));
-                        break;
-                    case "Snapchat":
-                        tempObject.put("url", "https://www.snapchat.com/add/" + (userName));
-                        break;
-                    case "LinkedIn":
-                        tempObject.put("url", "https://www.linkedin.com/in/" + (userName));
-                        break;
-                    case "GooglePlus":
-                        tempObject.put("url", "https://www.plus.google.com/" + (userName));
-                        break;
-                    case "Xbox":
-                        String usernameURL = URLEncoder.encode(userName, "utf-8");
-                        tempObject.put("url", "https://account.xbox.com/en-us/Profile?GamerTag=" + (usernameURL));
-                        break;
-                    case "PSN":
-                        usernameURL = URLEncoder.encode(userName, "utf-8");
-                        tempObject.put("url", "https://my.playstation.com/profile/" + (usernameURL));
-                        break;
-                    case "Twitch":
-                        tempObject.put("url", "https://m.twitch.tv/" + userName + "/profile");
-                        break;
-                    case "Custom":
-                        tempObject.put("url", userName);
-                        break;
-                    default:
-                        Log.d(TAG, "unknown app found: " + platform);
+                try {
+                    tempObject.put("username", userName);
+                    tempObject.put("displayName", displayName);
+                    tempObject.put("platform", platform);
+                    switch (platform) {
+                        case "Facebook":
+                            tempObject.put("url", "https://www.facebook.com/" + (userName));
+                            break;
+                        case "Twitter":
+                            tempObject.put("url", "https://www.twitter.com/" + (userName));
+                            break;
+                        case "Instagram":
+                            tempObject.put("url", "https://www.instagram.com/" + (userName));
+                            break;
+                        case "Snapchat":
+                            tempObject.put("url", "https://www.snapchat.com/add/" + (userName));
+                            break;
+                        case "LinkedIn":
+                            tempObject.put("url", "https://www.linkedin.com/in/" + (userName));
+                            break;
+                        case "GooglePlus":
+                            tempObject.put("url", "https://www.plus.google.com/" + (userName));
+                            break;
+                        case "Xbox":
+                            String usernameURL = URLEncoder.encode(userName, "utf-8");
+                            tempObject.put("url", "https://account.xbox.com/en-us/Profile?GamerTag=" + (usernameURL));
+                            break;
+                        case "PSN":
+                            usernameURL = URLEncoder.encode(userName, "utf-8");
+                            tempObject.put("url", "https://my.playstation.com/profile/" + (usernameURL));
+                            break;
+                        case "Twitch":
+                            tempObject.put("url", "https://m.twitch.tv/" + userName + "/profile");
+                            break;
+                        case "Custom":
+                            tempObject.put("url", userName);
+                            break;
+                        default:
+                            Log.d(TAG, "unknown app found: " + platform);
+                    }
+
+                    tempObject.put("isSwitchOn", true);
+                    Log.d(TAG, tempObject.toString());
+                } catch (JSONException j) {
+                    j.printStackTrace();
                 }
 
-                tempObject.put("isSwitchOn", true);
-                Log.d(TAG, tempObject.toString());
-            } catch (JSONException j) {
-                j.printStackTrace();
+
+                //Write
+                OutputStream os = httpcon.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(tempObject.toString());
+                writer.close();
+                os.close();
+
+                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+                Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+
+
+                if (httpcon.getResponseCode() != 404) {
+                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream());
+                } else {
+                }
+
+
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-
-            //Write
-            OutputStream os = httpcon.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(tempObject.toString());
-            writer.close();
-            os.close();
-
-            Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
-            Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
-
-
-            if (httpcon.getResponseCode() != 404) {
-                Log.e(TAG, "doInBackground: " + httpcon.getInputStream());
-            } else {
-            }
-
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
-    }
 
-    @Override
-    protected void onPostExecute(Void result) {
-        // populate list
-        mProgressDialog.dismiss();
-        Log.d(TAG, "App added: " + app.toString());
-        new DroidDialog.Builder(mcontext)
-                .icon(R.drawable.ic_action_tick)
-                .title("Success!")
-                .content("Your account has been added to the database.")
-                .cancelable(true, true)
-                .neutralButton("DISMISS", droidDialog -> {
-                    droidDialog.dismiss();
+        @Override
+        protected void onPostExecute(Void result) {
+            // populate list
+            mProgressDialog.dismiss();
+            Log.d(TAG, "App added: " + app.toString());
+            new DroidDialog.Builder(mcontext)
+                    .icon(R.drawable.ic_action_tick)
+                    .title("Success!")
+                    .content("Your account has been added to the database.")
+                    .cancelable(true, true)
+                    .neutralButton("DISMISS", droidDialog -> {
+                        droidDialog.dismiss();
 //            final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
 //            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
 //            snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
 //            snackBar.show();
-                }).show();
+                    }).show();
+
+        }
 
     }
-
 }
+

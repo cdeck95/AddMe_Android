@@ -1,5 +1,6 @@
 package com.tc2.linkup;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -32,6 +33,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 
@@ -46,6 +48,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     Integer appId;
     HttpURLConnection urlConnection = null;
     App singleApp;
+    Activity activity;
 
     public CustomEditAppsAdapter(Context context, int resource, ArrayList<App> apps) {
         super(context, resource, apps);
@@ -142,7 +145,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                 })
                 .negativeButton("DELETE", droidDialog -> {
                     droidDialog.dismiss();
-                    new DeleteAccount(getContext()).execute();
+                    new DeleteAccount(getContext(), activity).execute();
                 }).show();
     }
 
@@ -159,7 +162,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         dialogBuilder.setPositiveButton("Update", (dialog, whichButton) -> {
             String name = nameIn.getText().toString().trim();
             Log.d(TAG, name);
-            new EditAccount(getContext(), selected, name).execute();
+            new EditAccount(getContext(), activity, selected, name).execute();
         });
         dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) -> {
             //pass
@@ -182,7 +185,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         dialogBuilder.setPositiveButton("Update", (dialog, whichButton) -> {
             String username = usernameIn.getText().toString().trim();
             Log.d(TAG, username);
-            new EditAccount(getContext(), selected, username).execute();
+            new EditAccount(getContext(), activity, selected, username).execute();
         });
         dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) -> {
             //pass
@@ -192,6 +195,9 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         b.show();
     }
 
+    public void setActivity(Activity activityIn){
+        activity = activityIn;
+    }
     private void setSelected(Integer selectedIn){
         this.selected = selectedIn;
     }
@@ -211,6 +217,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     private class EditAccount extends AsyncTask<String, Void, Void> {
         String title;
         Context mcontext;
+        Activity activity;
         MaterialDialog dialog;
         String newUsername;
         String newDisplayName;
@@ -218,8 +225,9 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         JSONObject tempObject = new JSONObject();
 
 
-        public EditAccount(Context c, int selectedIn, String infoToBeUpdated) {
+        public EditAccount(Context c, Activity activityIn, int selectedIn, String infoToBeUpdated) {
             mcontext = c;
+            activity = activityIn;
             selected = selectedIn;
             if(selected == 1){
                 newUsername = infoToBeUpdated;
@@ -342,7 +350,22 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    activity.runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -370,12 +393,14 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     private class DeleteAccount extends AsyncTask<String, Void, Void> {
         String title;
         Context mcontext;
+        Activity activity;
         MaterialDialog dialog;
         JSONObject tempObject = new JSONObject();
 
 
-        public DeleteAccount(Context c) {
+        public DeleteAccount(Context c, Activity activityIn) {
             mcontext = c;
+            activity = activityIn;
         }
 
         @Override
@@ -432,7 +457,22 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    activity.runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {

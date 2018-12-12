@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import info.hoang8f.widget.FButton;
 
@@ -119,13 +121,13 @@ public class ImportCodeActivity extends Fragment {
                         Toast.makeText(getContext(), "Nothing Found", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     } catch (ChecksumException e) {
-                        Toast.makeText(getContext(), "Something weird happen, i was probably tired to solve this issue", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Something weird happened, maybe try again?", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     } catch (FormatException e) {
                         Toast.makeText(getContext(), "Wrong Barcode/QR format", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     } catch (NullPointerException e) {
-                        Toast.makeText(getContext(), "Something weird happen, i was probably tired to solve this issue", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Something weird happened, maybe try again?", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -197,6 +199,21 @@ public class ImportCodeActivity extends Fragment {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -278,6 +295,21 @@ public class ImportCodeActivity extends Fragment {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

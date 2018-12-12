@@ -47,6 +47,9 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
 
         fragment = this;
 
+        btnQRScan = rootView.findViewById(R.id.btnQRScan);
+        btnQRScan.setOnClickListener(this);
+
         Intent intent=new Intent(rootView.getContext(), QRScanner.class);
 //                intent.putExtra(EasyQR.IS_TOOLBAR_SHOW,true);
 //                intent.putExtra(EasyQR.TOOLBAR_DRAWABLE_ID,R.drawable.ic_audiotrack_dark);
@@ -65,17 +68,6 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
         intent.putExtra(EasyQR.BEEP_RESOURCE_ID,R.raw.beep);
         startActivityForResult(intent, EasyQR.QR_SCANNER_REQUEST);
 
-//        tvData= rootView.findViewById(R.id.tvData);
-//        btnQRScan= rootView.findViewById(R.id.btnQRScan);
-//
-//        btnQRScan.setOnClickListener(this);
-
-//        scanBtn = rootView.findViewById(R.id.scan_button);
-//        tvScanFormat = rootView.findViewById(R.id.tvScanFormat);
-//        tvScanContent = rootView.findViewById(R.id.tvScanContent);
-//        llSearch = rootView.findViewById(R.id.llSearch);
-//
-//        scanBtn.setOnClickListener(this);
         return rootView;
     }
 
@@ -133,57 +125,6 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
             } break;
         }
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-//        if (result != null) {
-//            if (result.getContents() == null) {
-//                llSearch.setVisibility(View.GONE);
-//                Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
-//                new ScanCodeActivity.ScanProfile(getContext(), 92).execute();
-//                Bundle bundle = new Bundle();
-//                bundle.putInt("profileId", 92);
-//                Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
-//                intent.putExtras(bundle);
-//                startActivity(intent);
-//            } else {
-//                Log.e(TAG, "Finished:" + result.getContents());
-//                try {
-//                    JSONObject jsonObject = new JSONObject(result.getContents());
-//                    String profileIdStr = jsonObject.getString("profileId");
-//                    Integer profileId = Integer.parseInt(profileIdStr);
-//                    //Log.e(TAG, "Account number: " + accounts.length());
-////                    if (accounts.length() > 0) {
-////                        for (int i = 0; i < accounts.length(); i++) {
-////                            JSONObject tempObject = accounts.getJSONObject(i);
-////                            //Log.e(TAG, "tempObject: " + tempObject.get("platform"));
-////                            if (tempObject.getString("platform").equals("Facebook")) {
-////                                String tempString = tempObject.getString("url");
-////                                Log.e(TAG, "Facebook Link: " + Uri.parse("fb://facewebmodal/f?href=" + tempString));
-////
-////                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + tempString.toLowerCase()));
-////                                startActivity(browserIntent);
-////                            }
-////                        }
-////                    }
-//                    new ScanCodeActivity.ScanProfile(getContext(), profileId).execute();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putInt("profileId", profileId);
-//                    Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
-//                    intent.putExtras(bundle);
-//                    startActivity(intent);
-//                } catch (JSONException j) {
-//                    j.printStackTrace();
-//                }
-//                llSearch.setVisibility(View.VISIBLE);
-//                tvScanContent.setText(result.getContents());
-//                tvScanFormat.setText(result.getFormatName());
-//            }
-//        } else {
-//            super.onActivityResult(requestCode, resultCode, data);
-//        }
-//    }
 
     private class ScanProfile extends AsyncTask<String, Void, Void> {
         String title;

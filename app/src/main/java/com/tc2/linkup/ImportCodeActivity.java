@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.example.myloadingbutton.MyLoadingButton;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
@@ -38,12 +37,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import info.hoang8f.widget.FButton;
+
 import static android.app.Activity.RESULT_OK;
 
 public class ImportCodeActivity extends Fragment {
 
     private static final String TAG = ImportCodeActivity.class.getSimpleName();
-    MyLoadingButton importCodeButton;
+    FButton importCodeButton;
     HttpURLConnection urlConnection;
     private static final int SELECT_PHOTO = 100;
     public String barcode;
@@ -57,7 +58,7 @@ public class ImportCodeActivity extends Fragment {
         importCodeButton = rootView.findViewById(R.id.importCodeButton);
         importCodeButton.setOnClickListener(v -> {
             //get image and read QR code
-            importCodeButton.showLoadingButton();
+            //importCodeButton.showLoadingButton();
             Intent photoPic = new Intent(Intent.ACTION_PICK);
             photoPic.setType("image/*");
             startActivityForResult(photoPic, SELECT_PHOTO);
@@ -130,7 +131,6 @@ public class ImportCodeActivity extends Fragment {
                         e.printStackTrace();
                     }
                 }
-                importCodeButton.showDoneButton();
         }
     }
 

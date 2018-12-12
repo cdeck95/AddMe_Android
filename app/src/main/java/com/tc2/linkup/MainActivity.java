@@ -97,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        if (id == R.id.action_edit_accounts) {
+            Intent intent = new Intent(getApplicationContext(), EditAccountsActivity.class);
             startActivity(intent);
         } else if (id == R.id.action_help) {
             //Initializing a bottom sheet

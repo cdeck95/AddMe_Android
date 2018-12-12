@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.droidbyme.dialoglib.DroidDialog;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -116,7 +117,7 @@ public class EditProfileActivity extends AppCompatActivity {
             Log.d(TAG, profile.toString());
             new SaveProfile(getApplicationContext(), profile).execute();
         } else if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
+            Intent intent = new Intent(this, EditAccountsActivity.class);
             startActivity(intent);
         } else if (id == R.id.action_help) {
             //Initializing a bottom sheet
@@ -403,8 +404,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            // populate list
-//            dialog.dismiss();
 //            new DroidDialog.Builder(mcontext)
 //                    .icon(R.drawable.ic_action_tick)
 //                    .title("Success!")
@@ -414,11 +413,6 @@ public class EditProfileActivity extends AppCompatActivity {
 //                        droidDialog.dismiss();
 //
 //                    }).show();
-
-            //            final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
-//            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
-//            snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
-//            snackBar.show();
             finish();
         }
     }

@@ -28,9 +28,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class EditAccountsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = "SettingsActivity";
+    private static final String TAG = "EditAccountsActivity";
     ListView appList;
     SwipeRefreshLayout swipeRefreshLayout;
     HttpURLConnection urlConnection = null;
@@ -41,7 +41,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.edit_accounts);
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout2);
         appList = findViewById(R.id.appsListView2);
@@ -60,7 +60,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                     })
                     .negativeButton("DELETE", droidDialog -> {
                         droidDialog.dismiss();
-                        new SettingsActivity.Networking(this).execute("DELETE");
+                        new EditAccountsActivity.Networking(this).execute("DELETE");
                     }).show();
         });
 
@@ -91,7 +91,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             snackBar.show();
         });
 
-        new SettingsActivity.Networking(this).execute("GET");
+        new EditAccountsActivity.Networking(this).execute("GET");
 
         return;
     }
@@ -122,6 +122,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         String title;
         Context mcontext;
         MaterialDialog dialog;
+        String request;
 
 
         public Networking(Context c) {
@@ -150,7 +151,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         @Override
         protected Void doInBackground(String... params) {
             //connect to API
-            String request = params[0];
+            request = params[0];
             JSONObject obj = null;
             JSONArray accounts = new JSONArray();
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
@@ -222,8 +223,17 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             populateApps(1, swipeRefreshLayout);
             //mProgressDialog.dismiss();
             dialog.dismiss();
+            if(request == "DELETE"){
+                new DroidDialog.Builder(mcontext)
+                        .icon(R.drawable.ic_action_tick)
+                        .title("Success!")
+                        .content("All of your accounts have been deleted from the database.")
+                        .cancelable(true, true)
+                        .neutralButton("DISMISS", droidDialog -> {
+                            droidDialog.dismiss();
+                        }).show();
+            }
 
         }
     }
-
 }

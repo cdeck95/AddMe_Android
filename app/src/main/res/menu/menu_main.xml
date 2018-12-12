@@ -5,20 +5,29 @@
     tools:context="com.example.christopherdeck.AddMe.MainActivity">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_notification1"
+        android:icon="@drawable/ic_menu_white_24dp"
+        android:title="action_notification"
+        app:showAsAction="always">
+        <menu>
+
+    <item
+        android:id="@+id/action_edit_accounts"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="@string/edit_accounts"
+        android:icon="@drawable/ic_supervisor_account_black_24dp"/>
 
     <item
         android:id="@+id/action_help"
         android:orderInCategory="100"
         android:title="@string/action_help"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_help_black_24dp"/>
 
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="100"
         android:title="@string/action_logout"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_exit_to_app_black_24dp"/>
+        </menu>
+    </item>
 </menu>

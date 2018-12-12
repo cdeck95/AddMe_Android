@@ -3,6 +3,8 @@ package com.tc2.linkup;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -129,20 +132,18 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     }
 
     private void deleteAccount() {
-        CFAlertDialog.Builder builder = new CFAlertDialog.Builder(getContext())
-                .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
-                .setTitle("Careful!")
-                .setMessage("Please confirm you wish to delete this account.");
-        builder.addButton("CANCEL", -1, -1, CFAlertDialog.CFAlertActionStyle.DEFAULT, CFAlertDialog.CFAlertActionAlignment.CENTER, (dialog, which) -> {
-            dialog.dismiss();
-        });
-        builder.addButton("DELETE", -1, -1, CFAlertDialog.CFAlertActionStyle.NEGATIVE, CFAlertDialog.CFAlertActionAlignment.CENTER, (dialog, which) -> {
-            new DeleteAccount(getContext()).execute();
-            dialog.dismiss();
-        });
-
-        // Show the alert
-        builder.show();
+        new DroidDialog.Builder(getContext())
+                .icon(R.drawable.ic_action_close)
+                .title("Woah!")
+                .content("You're about to delete all of your accounts. Are you sure you want to do that?")
+                .cancelable(true, true)
+                .positiveButton("CANCEL", droidDialog -> {
+                    droidDialog.dismiss();
+                })
+                .negativeButton("DELETE", droidDialog -> {
+                    droidDialog.dismiss();
+                    new DeleteAccount(getContext()).execute();
+                }).show();
     }
 
     private void editAccountName() {
@@ -355,6 +356,14 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         protected void onPostExecute(Void result) {
             dialog.dismiss();
             notifyDataSetChanged();
+            new DroidDialog.Builder(mcontext)
+                    .icon(R.drawable.ic_action_tick)
+                    .title("Success!")
+                    .content("Your account has been updated.")
+                    .cancelable(true, true)
+                    .neutralButton("DISMISS", droidDialog -> {
+                        droidDialog.dismiss();
+                    }).show();
         }
     }
 
@@ -437,6 +446,14 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         protected void onPostExecute(Void result) {
             dialog.dismiss();
             notifyDataSetChanged();
+            new DroidDialog.Builder(mcontext)
+                    .icon(R.drawable.ic_action_tick)
+                    .title("Success!")
+                    .content("Your account has been deleted from the database.")
+                    .cancelable(true, true)
+                    .neutralButton("DISMISS", droidDialog -> {
+                        droidDialog.dismiss();
+                    }).show();
         }
     }
 }

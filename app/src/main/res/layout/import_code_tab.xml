@@ -10,34 +10,35 @@
     <TextView
         android:id="@+id/textView4"
         android:layout_width="307dp"
-        android:layout_height="wrap_content"
+        android:layout_height="104dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:text="Have a code already? Press the button below to import it from the gallery!"
         android:textAlignment="center"
-        android:textSize="18sp"
+        android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/importCodeButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <com.example.myloadingbutton.MyLoadingButton
+
+    <info.hoang8f.widget.FButton
         android:id="@+id/importCodeButton"
         android:layout_width="201dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="40dp"
+        android:text="Import Code"
+        app:cornerRadius="5dp"
+        app:fButtonColor="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:mlb_label="Import Code"
-        app:mlb_labelSize="10dp"
-        app:mlb_labelColor="@color/colorAccent3"
-        app:mlb_loaderColor="@color/colorAccent"
-        app:mlb_setNormalAfterError="false"
-        app:mlb_animationDuration="300"/>
+        app:shadowColor="@color/colorAccent"
+        app:shadowEnabled="true"
+        app:shadowHeight="5dp" />
 
     <ImageView
         android:id="@+id/imageView3"

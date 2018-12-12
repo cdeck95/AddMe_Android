@@ -18,6 +18,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.MenuItem;
@@ -101,10 +103,10 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 new DownloadImageWithURLTask(imageView).execute( "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profileId + "/qr");
                 Log.e(TAG, "Refreshing Qr code...");
-//                final Snackbar snackBar = Snackbar.make(getActivity().findViewById(R.id.personalCodeLayout), "Refreshed", Snackbar.LENGTH_SHORT);
-//                snackBar.setAction("Dismiss", v2 -> snackBar.dismiss());
-//                snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-//                snackBar.show();
+                final Snackbar snackBar = Snackbar.make(getView(), "Refreshed", Snackbar.LENGTH_SHORT);
+                snackBar.setAction("Dismiss", v2 -> snackBar.dismiss());
+                snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+                snackBar.show();
             }
         });
 

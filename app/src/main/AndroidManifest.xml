@@ -37,7 +37,7 @@
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".ScannedProfileActivity"></activity>
         <activity android:name=".EditProfileActivity"></activity>
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".EditAccountsActivity"></activity>
         <activity android:name=".QRScanner" />
 
 

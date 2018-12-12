@@ -40,6 +40,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -62,6 +63,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -429,6 +431,23 @@ public class HomeActivity extends Fragment {
                     }
                 }
             } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                            new DroidDialog.Builder(mcontext)
+                                    .icon(R.drawable.ic_action_close)
+                                    .title("Uh-oh!")
+                                    .content("Are you connected to the internet?")
+                                    .cancelable(true, true)
+                                    .neutralButton("DISMISS", droidDialog -> {
+                                        droidDialog.dismiss();
+                                    }).show();
+                    });
+
+                }
+//                Log.e(TAG, e.getLocalizedMessage());
+//                Log.e(TAG, e.getMessage());
+//                Log.e(TAG, e.getCause()+"");
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -554,6 +573,21 @@ public class HomeActivity extends Fragment {
             }
             catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
@@ -654,6 +688,21 @@ public class HomeActivity extends Fragment {
             }
             catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch(AmazonServiceException e) {
                 // The call was transmitted successfully, but Amazon S3 couldn't process
                 // it, so it returned an error response.
@@ -791,6 +840,21 @@ public class HomeActivity extends Fragment {
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
+                } catch (UnknownHostException e){
+                    Log.e(TAG, e.getMessage());
+                    if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                        getActivity().runOnUiThread(() -> {
+                            new DroidDialog.Builder(mcontext)
+                                    .icon(R.drawable.ic_action_close)
+                                    .title("Uh-oh!")
+                                    .content("Are you connected to the internet?")
+                                    .cancelable(true, true)
+                                    .neutralButton("DISMISS", droidDialog -> {
+                                        droidDialog.dismiss();
+                                    }).show();
+                        });
+
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -949,6 +1013,21 @@ public class HomeActivity extends Fragment {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

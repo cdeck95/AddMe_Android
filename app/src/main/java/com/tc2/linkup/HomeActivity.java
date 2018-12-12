@@ -141,11 +141,9 @@ public class HomeActivity extends Fragment {
             builder.setSingleChoiceItems(new String[]{"Profile", "Account"}, 3, (dialogInterface, index) ->
             {
                 setSelected(index);
-                Toast.makeText(getContext(), "Selected:"+index, Toast.LENGTH_SHORT).show();
             });
             builder.addButton("DONE", -1, -1, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.END, (dialogInterface, i) ->
             {
-                Toast.makeText(getContext(), "Selected:"+selected, Toast.LENGTH_SHORT).show();
                 if(selected == 1){
                     openBottomSheet();
                 } else {

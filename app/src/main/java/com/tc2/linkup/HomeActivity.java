@@ -464,6 +464,8 @@ public class HomeActivity extends Fragment {
             getActivity().runOnUiThread(() -> {
                 mPager.setAdapter(mPagerAdapter);
                 mPager.setVisibility(View.VISIBLE);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+                mPagerAdapter.notifyDataSetChanged();
             });
             dialog.dismiss();
         }
@@ -779,7 +781,7 @@ public class HomeActivity extends Fragment {
 
                             obj = new JSONObject(builder.toString());
                             profiles = obj.getJSONArray("profiles");
-                            mPagerAdapter.notifyDataSetChanged();
+                           // mPagerAdapter.notifyDataSetChanged();
                             //prefs.edit().putString("accounts", builder.toString()).apply();
 
                         } else {
@@ -814,6 +816,8 @@ public class HomeActivity extends Fragment {
                 }
 
             }
+            mPagerAdapter.notifyDataSetChanged();
+            mSectionsPagerAdapter.notifyDataSetChanged();
             return null;
         }
         @Override
@@ -825,6 +829,8 @@ public class HomeActivity extends Fragment {
             getActivity().runOnUiThread(() -> {
                 mPager.setAdapter(mPagerAdapter);
                 mPager.setVisibility(View.VISIBLE);
+                mPagerAdapter.notifyDataSetChanged();
+                mSectionsPagerAdapter.notifyDataSetChanged();
             });
             new GetProfiles(mcontext).execute();
             dialog.dismiss();

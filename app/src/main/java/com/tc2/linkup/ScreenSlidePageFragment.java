@@ -74,7 +74,6 @@ public class ScreenSlidePageFragment extends Fragment {
                     .setDialogStyle(CFAlertDialog.CFAlertStyle.BOTTOM_SHEET)
                     .setTitle("What action would you like to perform?");
             builder.setItems(new String[]{"View Code", "Edit Profile", "Share Profile", "Delete Profile"}, (dialogInterface, index) -> {
-                Toast.makeText(rootView.getContext(), "Selected:"+index, Toast.LENGTH_SHORT).show();
                 if(index == 0){
                     Bundle args2 = new Bundle();
                     args2.putInt("profileId", profileId);
@@ -167,12 +166,6 @@ public class ScreenSlidePageFragment extends Fragment {
                     .progress(true, 0)
                     .progressIndeterminateStyle(true)
                     .show();
-
-//              mProgressDialog = new ProgressDialog(mcontext);
-//              mProgressDialog.setTitle("Contacting Server");
-//              mProgressDialog.setMessage("Loading...");
-//              mProgressDialog.setIndeterminate(false);
-//              mProgressDialog.show();
         }
 
         @Override
@@ -222,21 +215,13 @@ public class ScreenSlidePageFragment extends Fragment {
                 }
             }
 
-//            for (int n = 0; n < profilesArray.size(); n++) {
-//                try {
-//                    if (profilesArray.get(n).getProfileId() == profileId) {
-//                        profilesArray.remove(n);
-//                        Log.d(TAG, "Profile removed from array");
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+
+            //mPagerAdapter.notifyDataSetChanged();
             dialog.dismiss();
         }
     }

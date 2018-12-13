@@ -129,6 +129,7 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
         Context mcontext;
         MaterialDialog dialog;
         String request;
+        Boolean success = true;
 
 
         public Networking(Context c) {
@@ -196,6 +197,7 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
                     }
                 }
             } catch (UnknownHostException e){
+                success = false;
                 Log.e(TAG, e.getMessage());
                 if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
                      runOnUiThread(() -> {
@@ -211,6 +213,7 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
 
                 }
             }catch (Exception e) {
+                success = false;
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -244,7 +247,7 @@ public class EditAccountsActivity extends AppCompatActivity implements AdapterVi
             populateApps(1, swipeRefreshLayout);
             //mProgressDialog.dismiss();
             dialog.dismiss();
-            if(request == "DELETE"){
+            if(request == "DELETE" & success){
                 new DroidDialog.Builder(mcontext)
                         .icon(R.drawable.ic_action_tick)
                         .title("Success!")

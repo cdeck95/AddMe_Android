@@ -38,7 +38,18 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.tokens.CognitoAccessToken;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.cognitoidentity.AmazonCognitoIdentityClient;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.droidbyme.dialoglib.DroidDialog;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
@@ -73,7 +84,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class HomeActivity extends Fragment {
 
-    private static final String TAG = "MAIN_ACTIVITY";
+    private static final String TAG = "HOME_ACTIVITY";
     ImageButton imageButton;
     PublisherAdView mPublisherAdView;
 
@@ -98,6 +109,7 @@ public class HomeActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.activity_home, container, false);
+
         setCognitoId();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            Window w = getWindow(); // in Activity's onCreate() for instance
@@ -302,10 +314,7 @@ public class HomeActivity extends Fragment {
                 getResources().getString(R.string.pool_id), // Identity pool ID
                 Regions.US_EAST_1 // Region
         );
-
-        Log.d(TAG, credentialsProvider.getIdentityId() + "");
-        cognitoId = credentialsProvider.getIdentityId();
-        CredentialsManager.getInstance().setCognitoId(cognitoId);
+        new SetAccessToken(credentialsProvider).execute();
     }
 
 //    @Override
@@ -405,6 +414,7 @@ public class HomeActivity extends Fragment {
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
 
                 Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
                 Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
@@ -490,6 +500,76 @@ public class HomeActivity extends Fragment {
         }
     }
 
+    public class SetAccessToken extends AsyncTask<Void, Void, Void> {
+        String title;
+        CognitoCachingCredentialsProvider credentialsProvider;
+        MaterialDialog dialog;
+
+
+        public SetAccessToken(CognitoCachingCredentialsProvider credentialsProviderIn) {
+            credentialsProvider = credentialsProviderIn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+//            CognitoUserSession session = new CognitoUserSession()
+//            String accessToken = session.getAccessToken().getJWT();
+//            String idToken = session.getIdToken().getJWTToken();
+            Log.d(TAG, credentialsProvider.getIdentityId() + "");
+            cognitoId = credentialsProvider.getIdentityId();
+            CredentialsManager.getInstance().setCognitoId(cognitoId);
+            CognitoUserPool userPool = new CognitoUserPool(getContext(), getResources().getString(R.string.pool_id), "3oq4oaic2j4ar9dajsajsrcqeh", "1g4nhom8d3k4jm6fm020ing6keff61gqk20jksg1940uec3o2rb4");
+            CognitoUser cognitoUser = userPool.getCurrentUser();
+            cognitoUser.getSessionInBackground(new AuthenticationHandler() {
+                @Override
+                public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
+                        String idToken = userSession.getIdToken().getJWTToken();
+                        Log.e(TAG, idToken);
+                        CredentialsManager.getInstance().setAccessToken(idToken);
+                        Log.e(TAG, CredentialsManager.getInstance().getAccessToken());
+//                        Map<String, String> logins = new HashMap<String, String>();
+//                        logins.put("cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>", session.getIdToken().getJWTToken());
+//                        credentialsProvider.setLogins(logins);
+                }
+
+                @Override
+                public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
+                    Log.e(TAG, "getAuthenticationDetails");
+                }
+
+                @Override
+                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
+                    Log.e(TAG, "getMFACode");
+                }
+
+                @Override
+                public void authenticationChallenge(ChallengeContinuation continuation) {
+                    Log.e(TAG, "authenticationChallenge");
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure");
+                }
+            });
+//            CredentialsManager.getInstance().setAccessToken(IdentityManager.getDefaultIdentityManager().getCurrentIdentityProvider().getToken());
+//            Log.e(TAG, credentialsProvider.getToken());
+//            Log.e(TAG, credentialsProvider.getCredentials().getSessionToken());
+//            Log.e(TAG, credentialsProvider.getToken());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+        }
+    }
+
     public class POSTImage extends AsyncTask<Void, Void, Void> {
         String title;
         Context mcontext;
@@ -530,6 +610,7 @@ public class HomeActivity extends Fragment {
                 httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
                 httpcon.setRequestProperty("Content-Type", "application/json");
                 httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
                 httpcon.setRequestMethod("POST");
                 httpcon.connect();
 
@@ -784,6 +865,7 @@ public class HomeActivity extends Fragment {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestProperty("Content-Type", "application/json");
                 urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
                 urlConnection.setRequestMethod("POST");
                 urlConnection.connect();
 
@@ -989,6 +1071,7 @@ public class HomeActivity extends Fragment {
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
 
                 Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
                 Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());

@@ -29,6 +29,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.tokens.CognitoAccessToken;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.droidbyme.dialoglib.DroidDialog;
 
@@ -98,14 +101,14 @@ public class PersonalCodeBottomSheetFragment extends BottomSheetDialogFragment {
         if (imageView != null) {
             new DownloadImageWithURLTask(imageView).execute( "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profileId + "/qr");
         }
-
+        Log.e(TAG, IdentityManager.getDefaultIdentityManager().getCachedUserID());
         refreshButton = contentView.findViewById(R.id.refreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new DownloadImageWithURLTask(imageView).execute( "https://api.tc2pro.com/users/" + cognitoId + "/profiles/" + profileId + "/qr");
                 Log.e(TAG, "Refreshing Qr code...");
-                final Snackbar snackBar = Snackbar.make(getView(), "Refreshed", Snackbar.LENGTH_SHORT);
+                final Snackbar snackBar = Snackbar.make(contentView.getRootView(), "Refreshed", Snackbar.LENGTH_SHORT);
                 snackBar.setAction("Dismiss", v2 -> snackBar.dismiss());
                 snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
                 snackBar.show();

@@ -223,6 +223,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         String newDisplayName;
         Integer selected;
         JSONObject tempObject = new JSONObject();
+        boolean success = true;
 
 
         public EditAccount(Context c, Activity activityIn, int selectedIn, String infoToBeUpdated) {
@@ -351,6 +352,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                     }
                 }
             } catch (UnknownHostException e){
+                success = false;
                 Log.e(TAG, e.getMessage());
                 if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
                     activity.runOnUiThread(() -> {
@@ -366,6 +368,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
 
                 }
             }catch (Exception e) {
+                success = false;
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -379,14 +382,16 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         protected void onPostExecute(Void result) {
             dialog.dismiss();
             notifyDataSetChanged();
-            new DroidDialog.Builder(mcontext)
-                    .icon(R.drawable.ic_action_tick)
-                    .title("Success!")
-                    .content("Your account has been updated.")
-                    .cancelable(true, true)
-                    .neutralButton("DISMISS", droidDialog -> {
-                        droidDialog.dismiss();
-                    }).show();
+            if(success){
+                new DroidDialog.Builder(mcontext)
+                        .icon(R.drawable.ic_action_tick)
+                        .title("Success!")
+                        .content("Your account has been updated.")
+                        .cancelable(true, true)
+                        .neutralButton("DISMISS", droidDialog -> {
+                            droidDialog.dismiss();
+                        }).show();
+            }
         }
     }
 
@@ -396,7 +401,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         Activity activity;
         MaterialDialog dialog;
         JSONObject tempObject = new JSONObject();
-
+        boolean success = true;
 
         public DeleteAccount(Context c, Activity activityIn) {
             mcontext = c;
@@ -458,6 +463,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                     }
                 }
             } catch (UnknownHostException e){
+                success = false;
                 Log.e(TAG, e.getMessage());
                 if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
                     activity.runOnUiThread(() -> {
@@ -473,6 +479,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
 
                 }
             }catch (Exception e) {
+                success = false;
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -486,14 +493,16 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         protected void onPostExecute(Void result) {
             dialog.dismiss();
             notifyDataSetChanged();
-            new DroidDialog.Builder(mcontext)
-                    .icon(R.drawable.ic_action_tick)
-                    .title("Success!")
-                    .content("Your account has been deleted from the database.")
-                    .cancelable(true, true)
-                    .neutralButton("DISMISS", droidDialog -> {
-                        droidDialog.dismiss();
-                    }).show();
+            if(success){
+                new DroidDialog.Builder(mcontext)
+                        .icon(R.drawable.ic_action_tick)
+                        .title("Success!")
+                        .content("Your account has been deleted from the database.")
+                        .cancelable(true, true)
+                        .neutralButton("DISMISS", droidDialog -> {
+                            droidDialog.dismiss();
+                        }).show();
+            }
         }
     }
 }

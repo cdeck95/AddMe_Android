@@ -10,6 +10,8 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.auth.core.IdentityProvider;
+import com.amazonaws.mobile.auth.core.SignInResultHandler;
 import com.amazonaws.mobile.auth.core.SignInStateChangeListener;
 import com.amazonaws.mobile.auth.facebook.FacebookButton;
 import com.amazonaws.mobile.auth.ui.AuthUIConfiguration;
@@ -17,11 +19,16 @@ import com.amazonaws.mobile.auth.ui.SignInUI;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.droidbyme.dialoglib.DroidDialog;
 
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AuthenticatorActivity extends AppCompatActivity {
 
@@ -41,7 +48,29 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
                     @Override
                     public void onUserSignedIn() {
-                        IdentityManager.getDefaultIdentityManager();
+
+                        IdentityManager.getDefaultIdentityManager().login(getApplicationContext(), new SignInResultHandler() {
+                            @Override
+                            public void onSuccess(Activity callingActivity, IdentityProvider provider) {
+                                Log.e(TAG, provider.getToken());
+                                CredentialsManager.getInstance().setAccessToken(provider.getToken());
+                            }
+
+                            @Override
+                            public void onIntermediateProviderCancel(Activity callingActivity, IdentityProvider provider) {
+
+                            }
+
+                            @Override
+                            public void onIntermediateProviderError(Activity callingActivity, IdentityProvider provider, Exception ex) {
+
+                            }
+
+                            @Override
+                            public boolean onCancel(Activity callingActivity) {
+                                return false;
+                            }
+                        });
                     }
 
                     // Sign-out listener

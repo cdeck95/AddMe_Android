@@ -110,26 +110,56 @@ public class ImportCodeActivity extends Fragment {
                         Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
                         intent.putExtras(bundle);
                         startActivity(intent);
-//                        Integer profileId = 92;
-//                        new ScanProfile(getContext(), profileId).execute();
-//                        Bundle bundle = new Bundle();
-//                        bundle.putInt("profileId", profileId);
-//                        Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
-//                        intent.putExtras(bundle);
-//                        startActivity(intent);
                     } catch (NotFoundException e) {
-                        Toast.makeText(getContext(), "Nothing Found", Toast.LENGTH_SHORT).show();
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Hmm")
+                                .content("We didn't find a QR code. Maybe try again?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
                         e.printStackTrace();
                     } catch (ChecksumException e) {
-                        Toast.makeText(getContext(), "Something weird happened, maybe try again?", Toast.LENGTH_SHORT).show();
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Hmm")
+                                .content("Something weird happened, maybe try again?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
                         e.printStackTrace();
                     } catch (FormatException e) {
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Oops!")
+                                .content("Wrong Barcode/QR format. Please make sure you are scanning a LinkUp QR Code.")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
                         Toast.makeText(getContext(), "Wrong Barcode/QR format", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     } catch (NullPointerException e) {
-                        Toast.makeText(getContext(), "Something weird happened, maybe try again?", Toast.LENGTH_SHORT).show();
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Hmm")
+                                .content("Something weird happened, maybe try again?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
                         e.printStackTrace();
                     } catch (JSONException e) {
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Hmm")
+                                .content("Something weird happened, maybe try again?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
                         e.printStackTrace();
                     }
                 }

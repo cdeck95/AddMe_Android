@@ -1,10 +1,10 @@
 package com.tc2.linkup;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +31,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 
@@ -45,6 +46,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     Integer appId;
     HttpURLConnection urlConnection = null;
     App singleApp;
+    Activity activity;
 
     public CustomEditAppsAdapter(Context context, int resource, ArrayList<App> apps) {
         super(context, resource, apps);
@@ -131,20 +133,18 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     }
 
     private void deleteAccount() {
-        CFAlertDialog.Builder builder = new CFAlertDialog.Builder(getContext())
-                .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
-                .setTitle("Careful!")
-                .setMessage("Please confirm you wish to delete this account.");
-        builder.addButton("CANCEL", -1, -1, CFAlertDialog.CFAlertActionStyle.DEFAULT, CFAlertDialog.CFAlertActionAlignment.CENTER, (dialog, which) -> {
-            dialog.dismiss();
-        });
-        builder.addButton("DELETE", -1, -1, CFAlertDialog.CFAlertActionStyle.NEGATIVE, CFAlertDialog.CFAlertActionAlignment.CENTER, (dialog, which) -> {
-            new DeleteAccount(getContext()).execute();
-            dialog.dismiss();
-        });
-
-        // Show the alert
-        builder.show();
+        new DroidDialog.Builder(getContext())
+                .icon(R.drawable.ic_action_close)
+                .title("Woah!")
+                .content("You're about to delete all of your accounts. Are you sure you want to do that?")
+                .cancelable(true, true)
+                .positiveButton("CANCEL", droidDialog -> {
+                    droidDialog.dismiss();
+                })
+                .negativeButton("DELETE", droidDialog -> {
+                    droidDialog.dismiss();
+                    new DeleteAccount(getContext(), activity).execute();
+                }).show();
     }
 
     private void editAccountName() {
@@ -160,7 +160,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         dialogBuilder.setPositiveButton("Update", (dialog, whichButton) -> {
             String name = nameIn.getText().toString().trim();
             Log.d(TAG, name);
-            new EditAccount(getContext(), selected, name).execute();
+            new EditAccount(getContext(), activity, selected, name).execute();
         });
         dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) -> {
             //pass
@@ -183,7 +183,7 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         dialogBuilder.setPositiveButton("Update", (dialog, whichButton) -> {
             String username = usernameIn.getText().toString().trim();
             Log.d(TAG, username);
-            new EditAccount(getContext(), selected, username).execute();
+            new EditAccount(getContext(), activity, selected, username).execute();
         });
         dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) -> {
             //pass
@@ -193,6 +193,9 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         b.show();
     }
 
+    public void setActivity(Activity activityIn){
+        activity = activityIn;
+    }
     private void setSelected(Integer selectedIn){
         this.selected = selectedIn;
     }
@@ -212,15 +215,18 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
     private class EditAccount extends AsyncTask<String, Void, Void> {
         String title;
         Context mcontext;
+        Activity activity;
         MaterialDialog dialog;
         String newUsername;
         String newDisplayName;
         Integer selected;
         JSONObject tempObject = new JSONObject();
+        boolean success = true;
 
 
-        public EditAccount(Context c, int selectedIn, String infoToBeUpdated) {
+        public EditAccount(Context c, Activity activityIn, int selectedIn, String infoToBeUpdated) {
             mcontext = c;
+            activity = activityIn;
             selected = selectedIn;
             if(selected == 1){
                 newUsername = infoToBeUpdated;
@@ -343,7 +349,24 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                success = false;
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    activity.runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
+                success = false;
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -357,18 +380,30 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         protected void onPostExecute(Void result) {
             dialog.dismiss();
             notifyDataSetChanged();
+            if(success){
+                new DroidDialog.Builder(mcontext)
+                        .icon(R.drawable.ic_action_tick)
+                        .title("Success!")
+                        .content("Your account has been updated.")
+                        .cancelable(true, true)
+                        .neutralButton("DISMISS", droidDialog -> {
+                            droidDialog.dismiss();
+                        }).show();
+            }
         }
     }
 
     private class DeleteAccount extends AsyncTask<String, Void, Void> {
         String title;
         Context mcontext;
+        Activity activity;
         MaterialDialog dialog;
         JSONObject tempObject = new JSONObject();
+        boolean success = true;
 
-
-        public DeleteAccount(Context c) {
+        public DeleteAccount(Context c, Activity activityIn) {
             mcontext = c;
+            activity = activityIn;
         }
 
         @Override
@@ -425,7 +460,24 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                success = false;
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    activity.runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
+                success = false;
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -439,6 +491,16 @@ public class CustomEditAppsAdapter extends ArrayAdapter<App> {
         protected void onPostExecute(Void result) {
             dialog.dismiss();
             notifyDataSetChanged();
+            if(success){
+                new DroidDialog.Builder(mcontext)
+                        .icon(R.drawable.ic_action_tick)
+                        .title("Success!")
+                        .content("Your account has been deleted from the database.")
+                        .cancelable(true, true)
+                        .neutralButton("DISMISS", droidDialog -> {
+                            droidDialog.dismiss();
+                        }).show();
+            }
         }
     }
 }

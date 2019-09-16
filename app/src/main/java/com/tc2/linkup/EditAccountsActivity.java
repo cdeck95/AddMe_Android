@@ -1,27 +1,24 @@
 package com.tc2.linkup;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Switch;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.droidbyme.dialoglib.DroidDialog;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,31 +28,47 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class ProfileActivity extends Fragment implements AdapterView.OnItemClickListener {
+public class EditAccountsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = "ProfileActivity";
+    private static final String TAG = "EditAccountsActivity";
     ListView appList;
     SwipeRefreshLayout swipeRefreshLayout;
-    //ProgressDialog mProgressDialog;
     HttpURLConnection urlConnection = null;
-    SharedPreferences prefs;
-    private Switch appSwitch;
+    private Button editBtn, deleteAllBtn;
     private ArrayList<App> apps;
-    private ImageButton imageButton;
+    private Integer selected;
+    Activity activity;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.profile_tab, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.edit_accounts);
 
-        prefs = getContext().getSharedPreferences("MyPref", 0);
+        activity = this;
 
-        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
-        appList = rootView.findViewById(R.id.appsListView);
-        apps = new ArrayList<App>();
-        appSwitch = rootView.findViewById(R.id.appSwitch);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout2);
+        appList = findViewById(R.id.appsListView2);
+        apps = new ArrayList<>();
+
+
+        deleteAllBtn = findViewById(R.id.deleteAllBtn2);
+        deleteAllBtn.setOnClickListener(v -> {
+            new DroidDialog.Builder(this)
+                    .icon(R.drawable.ic_action_close)
+                    .title("Woah!")
+                    .content("You're about to delete all of your accounts. Are you sure you want to do that?")
+                    .cancelable(true, true)
+                    .positiveButton("CANCEL", droidDialog -> {
+                        droidDialog.dismiss();
+                    })
+                    .negativeButton("DELETE", droidDialog -> {
+                        droidDialog.dismiss();
+                        new EditAccountsActivity.Networking(this).execute("DELETE");
+                    }).show();
+        });
 
 
         appList.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -73,45 +86,25 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             }
         });
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.d(TAG, "----Refreshed----");
-                new Networking(getContext()).execute();
-                //populateApps(1, rootView);
-                swipeRefreshLayout.setRefreshing(false);
-                final Snackbar snackBar = Snackbar.make(getView(), "Refreshed", Snackbar.LENGTH_SHORT);
-                snackBar.setAction("Dismiss", v -> snackBar.dismiss());
-                snackBar.setActionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-                snackBar.show();
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d(TAG, "----Refreshed----");
+            new Networking(this).execute("GET");
+            //populateApps(1, rootView);
+            swipeRefreshLayout.setRefreshing(false);
+            final Snackbar snackBar = Snackbar.make(swipeRefreshLayout, "Refreshed", Snackbar.LENGTH_SHORT);
+            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+            snackBar.setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            snackBar.show();
         });
 
+        new EditAccountsActivity.Networking(this).execute("GET");
 
-        imageButton = rootView.findViewById(R.id.imageButton);
-
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Initializing a bottom sheet
-                BottomSheetDialogFragment bottomSheetDialogFragment = new PersonalCodeBottomSheetFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("apps", apps);
-                bottomSheetDialogFragment.setArguments(bundle);
-                //show it
-                FragmentManager fm = getFragmentManager();
-                bottomSheetDialogFragment.show(fm, bottomSheetDialogFragment.getTag());
-            }
-        });
-
-        return rootView;
+        return;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        new Networking(getContext()).execute();
 
+    private void setSelected(Integer selectedIn){
+        this.selected = selectedIn;
     }
 
     private void populateApps(int i, View v) {
@@ -120,7 +113,8 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
             appList.setVisibility(View.INVISIBLE);
         } else {
             appList.setVisibility(View.VISIBLE);
-            ListAdapter adapter = new CustomAppsAdapter(getContext(), 0, apps);
+            ListAdapter adapter = new CustomEditAppsAdapter(this, 0, apps);
+            ((CustomEditAppsAdapter) adapter).setActivity(this);
             appList.setAdapter(adapter);
         }
 
@@ -131,10 +125,12 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         Log.d(TAG, "On Item Click method params: " + position + " " + id);
     }
 
-    private class Networking extends AsyncTask<Void, Void, Void> {
+    private class Networking extends AsyncTask<String, Void, Void> {
         String title;
         Context mcontext;
         MaterialDialog dialog;
+        String request;
+        Boolean success = true;
 
 
         public Networking(Context c) {
@@ -161,8 +157,9 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(String... params) {
             //connect to API
+            request = params[0];
             JSONObject obj = null;
             JSONArray accounts = new JSONArray();
             String cognitoId = CredentialsManager.getInstance().getCognitoId();
@@ -175,6 +172,8 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod(request);
+
 
                 Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
                 Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
@@ -189,18 +188,33 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
                             builder.append(line);
                         }
 
-                        Log.e(TAG, "response buffer: " + builder.toString());
+                        Log.d(TAG, "response buffer: " + builder.toString());
 
                         obj = new JSONObject(builder.toString());
                         accounts = obj.getJSONArray("accounts");
-                        prefs.edit().putString("accounts", builder.toString()).apply();
-
                     } else {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                success = false;
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                     runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
+                success = false;
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -231,14 +245,20 @@ public class ProfileActivity extends Fragment implements AdapterView.OnItemClick
         @Override
         protected void onPostExecute(Void result) {
             // populate list
-            populateApps(1, getView());
+            populateApps(1, swipeRefreshLayout);
             //mProgressDialog.dismiss();
             dialog.dismiss();
+            if(request == "DELETE" & success){
+                new DroidDialog.Builder(mcontext)
+                        .icon(R.drawable.ic_action_tick)
+                        .title("Success!")
+                        .content("All of your accounts have been deleted from the database.")
+                        .cancelable(true, true)
+                        .neutralButton("DISMISS", droidDialog -> {
+                            droidDialog.dismiss();
+                        }).show();
+            }
 
         }
     }
-
-
 }
-
-

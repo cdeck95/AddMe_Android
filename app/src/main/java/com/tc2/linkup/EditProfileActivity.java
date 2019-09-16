@@ -1,18 +1,11 @@
 package com.tc2.linkup;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,15 +14,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amazonaws.mobile.auth.core.IdentityManager;
 import com.droidbyme.dialoglib.DroidDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -41,9 +38,8 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 public class EditProfileActivity extends AppCompatActivity {
 
@@ -123,7 +119,7 @@ public class EditProfileActivity extends AppCompatActivity {
             Log.d(TAG, profile.toString());
             new SaveProfile(getApplicationContext(), profile).execute();
         } else if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
+            Intent intent = new Intent(this, EditAccountsActivity.class);
             startActivity(intent);
         } else if (id == R.id.action_help) {
             //Initializing a bottom sheet
@@ -198,6 +194,21 @@ public class EditProfileActivity extends AppCompatActivity {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -299,7 +310,22 @@ public class EditProfileActivity extends AppCompatActivity {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -400,7 +426,22 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
 
 
-            } catch (UnsupportedEncodingException e) {
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -410,8 +451,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            // populate list
-//            dialog.dismiss();
 //            new DroidDialog.Builder(mcontext)
 //                    .icon(R.drawable.ic_action_tick)
 //                    .title("Success!")
@@ -421,11 +460,6 @@ public class EditProfileActivity extends AppCompatActivity {
 //                        droidDialog.dismiss();
 //
 //                    }).show();
-
-            //            final Snackbar snackBar = Snackbar.make(mView, "Refreshed", Snackbar.LENGTH_SHORT);
-//            snackBar.setAction("Dismiss", v -> snackBar.dismiss());
-//            snackBar.setActionTextColor(ContextCompat.getColor(mcontext, R.color.colorPrimary));
-//            snackBar.show();
             finish();
         }
     }
@@ -443,9 +477,28 @@ public class EditProfileActivity extends AppCompatActivity {
             try {
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
-                e.printStackTrace();
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    runOnUiThread(() -> {
+                        new DroidDialog.Builder(getApplicationContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            }catch (Exception e) {
+                if(e.getMessage() == null){
+                    e.printStackTrace();
+                }
+                 else {
+                    Log.d(TAG, e.getMessage());
+                }
             }
 
             return bitmap;

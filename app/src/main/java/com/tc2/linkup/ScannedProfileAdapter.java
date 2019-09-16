@@ -4,17 +4,17 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -90,6 +90,7 @@ public class ScannedProfileAdapter extends RecyclerView.Adapter<ScannedProfileAd
     public void openWebPage(String url) {
         try {
             Uri webpage = Uri.parse(url);
+            Log.d(TAG, webpage+"");
             Intent myIntent = new Intent(Intent.ACTION_VIEW, webpage);
             mContext.startActivity(myIntent);
         } catch (ActivityNotFoundException e) {

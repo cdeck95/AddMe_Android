@@ -20,6 +20,17 @@
       "Region": "us-east-1"
     }
   },
+  "S3TransferUtility": {
+    "Default": {
+      "Bucket": "addme-userfiles-mobilehub-1337549400",
+      "Region": "us-east-1"
+    }
+  },
+  "DynamoDBObjectMapper": {
+    "Default": {
+      "Region": "us-east-1"
+    }
+  },
   "PinpointAnalytics": {
     "Default": {
       "AppId": "b6cdcdf15ee341d9b75fe4c69116e14a",
@@ -31,9 +42,16 @@
       "Region": "us-east-1"
     }
   },
+  "UserFileManager": {
+    "Default": {
+      "Bucket": "addme-userfiles-mobilehub-1337549400",
+      "Region": "us-east-1"
+    }
+  },
   "GoogleSignIn": {
     "ClientId-WebApp": "800228810091-eqis98rdoq586fa2peo9cnlvh9dqpis7.apps.googleusercontent.com",
-    "ClientId-iOS": "800228810091-hin2rp3pv0424kjlq6cbcumtcjg98qmk.apps.googleusercontent.com",
+    "ClientId-iOS": "800228810091-agq705chb2tnq2pladvdqg5eefg0kfrh.apps.googleusercontent.com",
+    "ClientId-Android":"800228810091-cjmqshp87tes6cu8rk7m4b9f3mkoi0r6.apps.googleusercontent.com",
     "Permissions": "email,profile,openid"
   },
   "FacebookSignIn": {

@@ -13,6 +13,19 @@
                       <PersistentState>
                         <option name="children">
                           <map>
+                            <entry key="actionbar">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\cdeck_000\Downloads\baseline-settings-android-black\res\drawable-xxxhdpi\baseline_settings_black_18.png" />
+                                      <entry key="outputName" value="ic_settings" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
                             <entry key="launcher">
                               <value>
                                 <PersistentState>
@@ -35,7 +48,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="ffffff" />
-                                      <entry key="foregroundImage" value="$USER_HOME$/Desktop/AddMe/AddMe/Assets.xcassets/AddMeLogo-2.imageset/AddMeLogo-2.png" />
+                                      <entry key="foregroundImage" value="C:\Users\cdeck_000\Desktop\AddMe\AddMe\Assets.xcassets\AddMeLogo-2.imageset\AddMeLogo-2.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -65,7 +78,7 @@
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="cropped" value="true" />
                                       <entry key="iconShape" value="HRECT" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/Assets 2.xcassets/AppIcon.appiconset/1024.png" />
+                                      <entry key="imageAsset" value="C:\Users\cdeck_000\Downloads\Assets 2.xcassets\AppIcon.appiconset\1024.png" />
                                       <entry key="outputName" value="ic_launcher_horizontal" />
                                     </map>
                                   </option>
@@ -76,7 +89,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputIconType" value="LAUNCHER_LEGACY" />
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>
@@ -85,6 +98,11 @@
                 </map>
               </option>
             </PersistentState>
+          </value>
+        </entry>
+        <entry key="vectorWizard">
+          <value>
+            <PersistentState />
           </value>
         </entry>
       </map>

@@ -2,7 +2,6 @@ package com.tc2.linkup;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.io.Serializable;
 

@@ -1,16 +1,11 @@
 package com.tc2.linkup;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,21 +14,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
-import com.google.gson.Gson;
+import com.droidbyme.dialoglib.DroidDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class ScreenSlidePageFragment extends Fragment {
@@ -80,7 +77,6 @@ public class ScreenSlidePageFragment extends Fragment {
                     .setDialogStyle(CFAlertDialog.CFAlertStyle.BOTTOM_SHEET)
                     .setTitle("What action would you like to perform?");
             builder.setItems(new String[]{"View Code", "Edit Profile", "Share Profile", "Delete Profile"}, (dialogInterface, index) -> {
-                Toast.makeText(rootView.getContext(), "Selected:"+index, Toast.LENGTH_SHORT).show();
                 if(index == 0){
                     Bundle args2 = new Bundle();
                     args2.putInt("profileId", profileId);
@@ -137,6 +133,21 @@ public class ScreenSlidePageFragment extends Fragment {
             try {
                 InputStream in = new java.net.URL(pathToFile).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch (Exception e) {
                 Log.d(TAG, e.getMessage());
                 e.printStackTrace();
@@ -173,12 +184,6 @@ public class ScreenSlidePageFragment extends Fragment {
                     .progress(true, 0)
                     .progressIndeterminateStyle(true)
                     .show();
-
-//              mProgressDialog = new ProgressDialog(mcontext);
-//              mProgressDialog.setTitle("Contacting Server");
-//              mProgressDialog.setMessage("Loading...");
-//              mProgressDialog.setIndeterminate(false);
-//              mProgressDialog.show();
         }
 
         @Override
@@ -220,6 +225,21 @@ public class ScreenSlidePageFragment extends Fragment {
                         return null;
                     }
                 }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -228,21 +248,13 @@ public class ScreenSlidePageFragment extends Fragment {
                 }
             }
 
-//            for (int n = 0; n < profilesArray.size(); n++) {
-//                try {
-//                    if (profilesArray.get(n).getProfileId() == profileId) {
-//                        profilesArray.remove(n);
-//                        Log.d(TAG, "Profile removed from array");
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+
+            //mPagerAdapter.notifyDataSetChanged();
             dialog.dismiss();
         }
     }

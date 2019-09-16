@@ -2,10 +2,8 @@ package com.tc2.linkup;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,14 +12,12 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.zxing.client.android.Intents;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.droidbyme.dialoglib.DroidDialog;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +25,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
+
+import static android.app.Activity.RESULT_OK;
 
 //import android.support.v4.app.Fragment;
 
@@ -41,6 +40,9 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
     private Fragment fragment;
     private Context context;
     HttpURLConnection urlConnection;
+    TextView tvData;
+    Button btnQRScan;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,71 +50,90 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
 
         fragment = this;
 
-        scanBtn = rootView.findViewById(R.id.scan_button);
-        tvScanFormat = rootView.findViewById(R.id.tvScanFormat);
-        tvScanContent = rootView.findViewById(R.id.tvScanContent);
-        llSearch = rootView.findViewById(R.id.llSearch);
+        btnQRScan = rootView.findViewById(R.id.btnQRScan);
+        btnQRScan.setOnClickListener(this);
 
-        scanBtn.setOnClickListener(this);
+        Intent intent=new Intent(rootView.getContext(), QRScanner.class);
+//                intent.putExtra(EasyQR.IS_TOOLBAR_SHOW,true);
+//                intent.putExtra(EasyQR.TOOLBAR_DRAWABLE_ID,R.drawable.ic_audiotrack_dark);
+//                intent.putExtra(EasyQR.TOOLBAR_TEXT,"My QR");
+//                intent.putExtra(EasyQR.TOOLBAR_BACKGROUND_COLOR,"#0588EE");
+//                intent.putExtra(EasyQR.TOOLBAR_TEXT_COLOR,"#FFFFFF");
+//                intent.putExtra(EasyQR.BACKGROUND_COLOR,"#000000");
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_LEFT,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_TOP,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_RIGHT,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_BOTTOM,50);
+        intent.putExtra(EasyQR.CAMERA_BORDER,100);
+        intent.putExtra(EasyQR.CAMERA_BORDER_COLOR,"#C1000000");
+        intent.putExtra(EasyQR.IS_SCAN_BAR,true);
+        intent.putExtra(EasyQR.IS_BEEP,true);
+        intent.putExtra(EasyQR.BEEP_RESOURCE_ID,R.raw.beep);
+        startActivityForResult(intent, EasyQR.QR_SCANNER_REQUEST);
+
         return rootView;
     }
 
     public void onClick(View v) {
-        IntentIntegrator integrator = new IntentIntegrator(getActivity());
-        Intent i = integrator.createScanIntent();
-        i.setAction(Intents.Scan.ONE_D_MODE);
-        i.putExtra("RESULT_DISPLAY_DURATION_MS", 0L);
-        startActivityForResult(i, IntentIntegrator.REQUEST_CODE);
+        switch (v.getId()){
+            case R.id.btnQRScan: {
+                Intent intent=new Intent(v.getContext(), QRScanner.class);
+//                intent.putExtra(EasyQR.IS_TOOLBAR_SHOW,true);
+//                intent.putExtra(EasyQR.TOOLBAR_DRAWABLE_ID,R.drawable.ic_audiotrack_dark);
+//                intent.putExtra(EasyQR.TOOLBAR_TEXT,"My QR");
+//                intent.putExtra(EasyQR.TOOLBAR_BACKGROUND_COLOR,"#0588EE");
+//                intent.putExtra(EasyQR.TOOLBAR_TEXT_COLOR,"#FFFFFF");
+//                intent.putExtra(EasyQR.BACKGROUND_COLOR,"#000000");
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_LEFT,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_TOP,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_RIGHT,50);
+//                intent.putExtra(EasyQR.CAMERA_MARGIN_BOTTOM,50);
+                intent.putExtra(EasyQR.CAMERA_BORDER,100);
+                intent.putExtra(EasyQR.CAMERA_BORDER_COLOR,"#C1000000");
+                intent.putExtra(EasyQR.IS_SCAN_BAR,true);
+                intent.putExtra(EasyQR.IS_BEEP,true);
+                intent.putExtra(EasyQR.BEEP_RESOURCE_ID,R.raw.beep);
+                startActivityForResult(intent, EasyQR.QR_SCANNER_REQUEST);
+            } break;
+        }
+//        IntentIntegrator integrator = new IntentIntegrator(getActivity());
+//        Intent i = integrator.createScanIntent();
+//        i.setAction(Intents.Scan.ONE_D_MODE);
+//        i.putExtra("RESULT_DISPLAY_DURATION_MS", 0L);
+//        startActivityForResult(i, IntentIntegrator.REQUEST_CODE);
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-                llSearch.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
-                new ScanCodeActivity.ScanProfile(getContext(), 90).execute();
-                Bundle bundle = new Bundle();
-                bundle.putInt("profileId", 90);
-                Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            } else {
-                Log.e(TAG, "Finished:" + result.getContents());
-                try {
-                    JSONObject jsonObject = new JSONObject(result.getContents());
-                    String profileIdStr = jsonObject.getString("profileId");
-                    Integer profileId = Integer.parseInt(profileIdStr);
-                    //Log.e(TAG, "Account number: " + accounts.length());
-//                    if (accounts.length() > 0) {
-//                        for (int i = 0; i < accounts.length(); i++) {
-//                            JSONObject tempObject = accounts.getJSONObject(i);
-//                            //Log.e(TAG, "tempObject: " + tempObject.get("platform"));
-//                            if (tempObject.getString("platform").equals("Facebook")) {
-//                                String tempString = tempObject.getString("url");
-//                                Log.e(TAG, "Facebook Link: " + Uri.parse("fb://facewebmodal/f?href=" + tempString));
-//
-//                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + tempString.toLowerCase()));
-//                                startActivity(browserIntent);
-//                            }
-//                        }
-//                    }
-                    new ScanCodeActivity.ScanProfile(getContext(), profileId).execute();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("profileId", profileId);
-                    Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                } catch (JSONException j) {
-                    j.printStackTrace();
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case EasyQR.QR_SCANNER_REQUEST: {
+                if (resultCode==RESULT_OK){
+                   // tvData.setText(data.getStringExtra(EasyQR.DATA));
+                    try {
+                        JSONObject jsonObject = new JSONObject(data.getStringExtra(EasyQR.DATA));
+                        Integer profileId = Integer.parseInt(jsonObject.getString("profileId"));
+                        new ScanCodeActivity.ScanProfile(getContext(), profileId).execute();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("profileId", profileId);
+                        Intent intent = new Intent(getActivity(), ScannedProfileActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        new DroidDialog.Builder(getContext())
+                                .icon(R.drawable.ic_action_close)
+                                .title("Hmm")
+                                .content("The QR code doesn't seem right. Is it a LinkUp created QR code?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    }
+
                 }
-                llSearch.setVisibility(View.VISIBLE);
-                tvScanContent.setText(result.getContents());
-                tvScanFormat.setText(result.getFormatName());
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+            } break;
         }
     }
 
@@ -179,6 +200,21 @@ public class ScanCodeActivity extends Fragment implements AdapterView.OnClickLis
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

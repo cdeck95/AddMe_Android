@@ -2,47 +2,61 @@ package com.tc2.linkup;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.tokens.CognitoAccessToken;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.cognitoidentity.AmazonCognitoIdentityClient;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
+import com.droidbyme.dialoglib.DroidDialog;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +64,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -58,15 +75,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.app.Activity.RESULT_OK;
 
 
 public class HomeActivity extends Fragment {
 
-    private static final String TAG = "MAIN_ACTIVITY";
+    private static final String TAG = "HOME_ACTIVITY";
     ImageButton imageButton;
     PublisherAdView mPublisherAdView;
 
@@ -80,16 +99,18 @@ public class HomeActivity extends Fragment {
     private FloatingActionButton addAppButton;
     private Integer selected = -1;
     private String cognitoId;
-
+    private static final int SELECT_PHOTO = 100;
     String defaultImageURL = "https://images.pexels.com/photos/708440/pexels-photo-708440.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
     private ArrayList<App> allAccounts = new ArrayList<>();
     SwipeRefreshLayout pullToRefresh;
+    ImageView profileImage;
     // private JSONArray allAccounts = new JSONArray();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.activity_home, container, false);
+
         setCognitoId();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            Window w = getWindow(); // in Activity's onCreate() for instance
@@ -106,6 +127,13 @@ public class HomeActivity extends Fragment {
                         ContextCompat.getColor(getContext(), R.color.GColor2)});
 
         rootView.findViewById(R.id.background).setBackground(gradientDrawable);
+        profileImage = rootView.findViewById(R.id.profileImage);
+
+        profileImage.setOnClickListener(v -> {
+            Intent photoPic = new Intent(Intent.ACTION_PICK);
+            photoPic.setType("image/*");
+            startActivityForResult(photoPic, SELECT_PHOTO);
+        });
 
         Permissions();
 
@@ -128,11 +156,9 @@ public class HomeActivity extends Fragment {
             builder.setSingleChoiceItems(new String[]{"Profile", "Account"}, 3, (dialogInterface, index) ->
             {
                 setSelected(index);
-                Toast.makeText(getContext(), "Selected:"+index, Toast.LENGTH_SHORT).show();
             });
             builder.addButton("DONE", -1, -1, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.END, (dialogInterface, i) ->
             {
-                Toast.makeText(getContext(), "Selected:"+selected, Toast.LENGTH_SHORT).show();
                 if(selected == 1){
                     openBottomSheet();
                 } else {
@@ -214,6 +240,35 @@ public class HomeActivity extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        switch (requestCode) {
+            case SELECT_PHOTO:
+                if (resultCode == RESULT_OK) {
+//doing some uri parsing
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    InputStream imageStream = null;
+                    try {
+                        //getting the image
+                        imageStream = getActivity().getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+
+                    //decoding bitmap
+                    Bitmap bMap = BitmapFactory.decodeStream(imageStream);
+                    profileImage.setImageBitmap(bMap);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] imageBytes = baos.toByteArray();
+                    String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+                    new POSTImage(getContext(), imageString).execute();
+                }
+        }
+    }
+
     private void enableDisableSwipeRefresh(boolean enable) {
         if (pullToRefresh != null) {
             pullToRefresh.setEnabled(enable);
@@ -260,10 +315,7 @@ public class HomeActivity extends Fragment {
                 getResources().getString(R.string.pool_id), // Identity pool ID
                 Regions.US_EAST_1 // Region
         );
-
-        Log.d(TAG, credentialsProvider.getIdentityId() + "");
-        cognitoId = credentialsProvider.getIdentityId();
-        CredentialsManager.getInstance().setCognitoId(cognitoId);
+        new SetAccessToken(credentialsProvider).execute();
     }
 
 //    @Override
@@ -363,6 +415,7 @@ public class HomeActivity extends Fragment {
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
 
                 Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
                 Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
@@ -389,6 +442,23 @@ public class HomeActivity extends Fragment {
                     }
                 }
             } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                            new DroidDialog.Builder(mcontext)
+                                    .icon(R.drawable.ic_action_close)
+                                    .title("Uh-oh!")
+                                    .content("Are you connected to the internet?")
+                                    .cancelable(true, true)
+                                    .neutralButton("DISMISS", droidDialog -> {
+                                        droidDialog.dismiss();
+                                    }).show();
+                    });
+
+                }
+//                Log.e(TAG, e.getLocalizedMessage());
+//                Log.e(TAG, e.getMessage());
+//                Log.e(TAG, e.getCause()+"");
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
@@ -414,6 +484,319 @@ public class HomeActivity extends Fragment {
             }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // populate list
+            //TODO:Create populateProfiles
+            // populateProfiles(1, getView());
+            //mProgressDialog.dismiss();
+            getActivity().runOnUiThread(() -> {
+                mPager.setAdapter(mPagerAdapter);
+                mPager.setVisibility(View.VISIBLE);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+                mPagerAdapter.notifyDataSetChanged();
+            });
+            dialog.dismiss();
+        }
+    }
+
+    public class SetAccessToken extends AsyncTask<Void, Void, Void> {
+        String title;
+        CognitoCachingCredentialsProvider credentialsProvider;
+        MaterialDialog dialog;
+
+
+        public SetAccessToken(CognitoCachingCredentialsProvider credentialsProviderIn) {
+            credentialsProvider = credentialsProviderIn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+//            CognitoUserSession session = new CognitoUserSession()
+//            String accessToken = session.getAccessToken().getJWT();
+//            String idToken = session.getIdToken().getJWTToken();
+            Log.d(TAG, credentialsProvider.getIdentityId() + "");
+            cognitoId = credentialsProvider.getIdentityId();
+            CredentialsManager.getInstance().setCognitoId(cognitoId);
+            CognitoUserPool userPool = new CognitoUserPool(getContext(), getResources().getString(R.string.pool_id), "3oq4oaic2j4ar9dajsajsrcqeh", "1g4nhom8d3k4jm6fm020ing6keff61gqk20jksg1940uec3o2rb4");
+            CognitoUser cognitoUser = userPool.getCurrentUser();
+            cognitoUser.getSessionInBackground(new AuthenticationHandler() {
+                @Override
+                public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
+                        String idToken = userSession.getIdToken().getJWTToken();
+                        Log.e(TAG, idToken);
+                        CredentialsManager.getInstance().setAccessToken(idToken);
+                        Log.e(TAG, CredentialsManager.getInstance().getAccessToken());
+//                        Map<String, String> logins = new HashMap<String, String>();
+//                        logins.put("cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>", session.getIdToken().getJWTToken());
+//                        credentialsProvider.setLogins(logins);
+                }
+
+                @Override
+                public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
+                    Log.e(TAG, "getAuthenticationDetails");
+                }
+
+                @Override
+                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
+                    Log.e(TAG, "getMFACode");
+                }
+
+                @Override
+                public void authenticationChallenge(ChallengeContinuation continuation) {
+                    Log.e(TAG, "authenticationChallenge");
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e(TAG, "onFailure");
+                }
+            });
+//            CredentialsManager.getInstance().setAccessToken(IdentityManager.getDefaultIdentityManager().getCurrentIdentityProvider().getToken());
+//            Log.e(TAG, credentialsProvider.getToken());
+//            Log.e(TAG, credentialsProvider.getCredentials().getSessionToken());
+//            Log.e(TAG, credentialsProvider.getToken());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+        }
+    }
+
+    public class POSTImage extends AsyncTask<Void, Void, Void> {
+        String title;
+        Context mcontext;
+        MaterialDialog dialog;
+        String imageString;
+        JSONObject postParams;
+        String presignedURL;
+
+        public POSTImage(Context c, String imageStringIn) {
+            mcontext = c;
+            imageString = imageStringIn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            dialog = new MaterialDialog.Builder(mcontext)
+                    .title("Contacting Server")
+                    .content("Loading...")
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection httpcon;
+            JSONObject tempObject = new JSONObject();
+
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String url = "https://api.tc2pro.com/users/" + cognitoId + "/images/";
+
+            Log.e(TAG, "Retrieve Data URL: " + url);
+            try {
+                //Connect
+                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+                httpcon.setRequestProperty("Content-Type", "application/json");
+                httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
+                httpcon.setRequestMethod("POST");
+                httpcon.connect();
+
+//                try {
+//                    tempObject.put("username", bitmap);
+//                    Log.d(TAG, tempObject.toString());
+//                } catch (JSONException j) {
+//                    j.printStackTrace();
+//                }
+
+
+                //Write
+                OutputStream os = httpcon.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(tempObject.toString());
+                writer.close();
+                os.close();
+
+                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+                Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+
+
+                if (httpcon.getResponseCode() == 404) {
+                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream().toString());
+                } else {
+                    if (httpcon.getInputStream() != null) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line = in.readLine()) != null) {
+                            builder.append(line);
+                        }
+                        Log.e(TAG, "response buffer: " + builder.toString());
+                        JSONObject jsonObject = new JSONObject(builder.toString());
+                        postParams = jsonObject.getJSONObject("fields");
+                        postParams.put("file", imageString);
+                        Log.d(TAG, "base 64 encoded bitmap: "  + imageString);
+                        presignedURL = jsonObject.getString("url");
+                    }
+                }
+            }
+            catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // populate list
+            //TODO:Create populateProfiles
+            // populateProfiles(1, getView());
+            //mProgressDialog.dismiss();
+            getActivity().runOnUiThread(() -> {
+                mPager.setAdapter(mPagerAdapter);
+                mPager.setVisibility(View.VISIBLE);
+            });
+            dialog.dismiss();
+            new POSTImageToAWS(getContext(), presignedURL, postParams).execute();
+        }
+    }
+
+    public class POSTImageToAWS extends AsyncTask<Void, Void, Void> {
+        String title;
+        Context mcontext;
+        MaterialDialog dialog;
+        JSONObject postParams;
+        String presignedURL;
+
+        public POSTImageToAWS(Context c, String presignedURLIn, JSONObject postParamsIn) {
+            mcontext = c;
+            postParams = postParamsIn;
+            presignedURL = presignedURLIn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            dialog = new MaterialDialog.Builder(mcontext)
+                    .title("Contacting Server")
+                    .content("Loading...")
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection httpcon;
+            JSONObject tempObject = new JSONObject();
+
+            String cognitoId = CredentialsManager.getInstance().getCognitoId();
+            String url = presignedURL;
+
+            Log.e(TAG, "Presigned URL: " + url);
+            try {
+                //Connect
+                httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
+                httpcon.setRequestProperty("Content-Type", "application/json");
+                httpcon.setRequestProperty("Accept", "application/json");
+                httpcon.setRequestMethod("POST");
+                httpcon.setRequestProperty("http.keepAlive", "true");
+                httpcon.setDoOutput(true);
+
+                //Write
+                OutputStream os = httpcon.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(postParams.toString());
+                Log.d(TAG, postParams.toString());
+                Log.d(TAG, postParams.getString("file"));
+                writer.flush();
+                writer.close();
+                os.close();
+                httpcon.connect();
+
+                Log.e(TAG, "Response Number: " + httpcon.getResponseCode());
+                Log.e(TAG, "Response Body: " + httpcon.getResponseMessage());
+                Log.e(TAG, "Other: " + httpcon.toString());
+
+
+                if (httpcon.getResponseCode() == 404) {
+                    Log.e(TAG, "doInBackground: " + httpcon.getInputStream().toString());
+                } else {
+                    if (httpcon.getInputStream() != null) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line = in.readLine()) != null) {
+                            builder.append(line);
+                        }
+                        Log.e(TAG, "response buffer: " + builder.toString());
+                    }
+                }
+            }
+            catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
+                }
+            } catch(AmazonServiceException e) {
+                // The call was transmitted successfully, but Amazon S3 couldn't process
+                // it, so it returned an error response.
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
 
         @Override
         protected void onPostExecute(Void result) {
@@ -483,6 +866,7 @@ public class HomeActivity extends Fragment {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestProperty("Content-Type", "application/json");
                 urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
                 urlConnection.setRequestMethod("POST");
                 urlConnection.connect();
 
@@ -529,7 +913,7 @@ public class HomeActivity extends Fragment {
 
                             obj = new JSONObject(builder.toString());
                             profiles = obj.getJSONArray("profiles");
-                            mPagerAdapter.notifyDataSetChanged();
+                           // mPagerAdapter.notifyDataSetChanged();
                             //prefs.edit().putString("accounts", builder.toString()).apply();
 
                         } else {
@@ -539,6 +923,21 @@ public class HomeActivity extends Fragment {
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
+                } catch (UnknownHostException e){
+                    Log.e(TAG, e.getMessage());
+                    if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                        getActivity().runOnUiThread(() -> {
+                            new DroidDialog.Builder(mcontext)
+                                    .icon(R.drawable.ic_action_close)
+                                    .title("Uh-oh!")
+                                    .content("Are you connected to the internet?")
+                                    .cancelable(true, true)
+                                    .neutralButton("DISMISS", droidDialog -> {
+                                        droidDialog.dismiss();
+                                    }).show();
+                        });
+
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -564,6 +963,8 @@ public class HomeActivity extends Fragment {
                 }
 
             }
+            mPagerAdapter.notifyDataSetChanged();
+            mSectionsPagerAdapter.notifyDataSetChanged();
             return null;
         }
         @Override
@@ -575,6 +976,8 @@ public class HomeActivity extends Fragment {
             getActivity().runOnUiThread(() -> {
                 mPager.setAdapter(mPagerAdapter);
                 mPager.setVisibility(View.VISIBLE);
+                mPagerAdapter.notifyDataSetChanged();
+                mSectionsPagerAdapter.notifyDataSetChanged();
             });
             new GetProfiles(mcontext).execute();
             dialog.dismiss();
@@ -669,6 +1072,7 @@ public class HomeActivity extends Fragment {
                 url = new URL(urlIn);
                 Log.d(TAG, "URL: " + urlIn);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization", CredentialsManager.getInstance().getAccessToken());
 
                 Log.e(TAG, "Response Code: " + urlConnection.getResponseCode());
                 Log.e(TAG, "Response Message: " + urlConnection.getResponseMessage());
@@ -693,6 +1097,21 @@ public class HomeActivity extends Fragment {
                         Log.d(TAG, "No input stream");
                         return null;
                     }
+                }
+            } catch (UnknownHostException e){
+                Log.e(TAG, e.getMessage());
+                if(e.getMessage().equals("Unable to resolve host \"api.tc2pro.com\": No address associated with hostname")){
+                    getActivity().runOnUiThread(() -> {
+                        new DroidDialog.Builder(mcontext)
+                                .icon(R.drawable.ic_action_close)
+                                .title("Uh-oh!")
+                                .content("Are you connected to the internet?")
+                                .cancelable(true, true)
+                                .neutralButton("DISMISS", droidDialog -> {
+                                    droidDialog.dismiss();
+                                }).show();
+                    });
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

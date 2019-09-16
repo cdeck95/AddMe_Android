@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:weightSum="1">
 
-    <android.support.v7.widget.CardView
+    <androidx.appcompat.widget.CardView
         android:id="@+id/card_view_edit_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,5 +86,5 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.appcompat.widget.CardView>
 </LinearLayout>
